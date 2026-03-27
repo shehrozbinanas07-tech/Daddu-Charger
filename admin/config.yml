@@ -1,0 +1,23 @@
+backend:
+  name: git-gateway
+  branch: main # Change this to 'master' if your GitHub says 'master' instead of 'main'
+
+media_folder: "images"
+public_folder: "/images"
+
+collections:
+  - name: "products"
+    label: "Products"
+    folder: "_products"
+    create: true
+    slug: "{{sku}}"
+    fields:
+      - {label: "SKU", name: "sku", widget: "string"}
+      - {label: "Name", name: "name", widget: "string"}
+      - {label: "Category", name: "category", widget: "select", options: ["keyboards", "mice", "chairs", "headphones", "monitors", "controllers"]}
+      - {label: "Price (PKR)", name: "price", widget: "number"}
+      - {label: "Old Price", name: "oldPrice", widget: "number", required: false}
+      - {label: "Image", name: "image", widget: "image"}
+      - {label: "Description", name: "description", widget: "markdown"}
+      - {label: "Featured", name: "featured", widget: "boolean", default: false}
+      - {label: "Specs", name: "specs", widget: "list", fields: [{label: "Key", name: "key", widget: "string"}, {label: "Value", name: "value", widget: "string"}]}
