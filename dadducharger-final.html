@@ -1,0 +1,1547 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Daddu Charger – Gaming Store Rawalpindi</title>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Rajdhani:wght@500;600;700&display=swap" rel="stylesheet">
+<style>
+/* ── TOKENS ── */
+:root{
+  --y:#F5C400; --yd:#c9a000;
+  --bg:#080808; --bg2:#0f0f0f; --card:#131313;
+  --border:#252525; --white:#f0f0f0; --muted:#6a6a6a;
+  --green:#22c55e; --r:4px;
+}
+
+/* ── RESET ── */
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:auto} /* disable smooth-scroll globally — we handle it */
+body{background:var(--bg);color:var(--white);font-family:'Rajdhani',sans-serif;font-weight:500;overflow-x:hidden;line-height:1.55;cursor:none}
+::selection{background:var(--y);color:#111}
+::-webkit-scrollbar{width:3px}::-webkit-scrollbar-track{background:var(--bg)}::-webkit-scrollbar-thumb{background:var(--y);border-radius:2px}
+img{display:block;max-width:100%;height:auto}
+a{text-decoration:none;color:inherit}
+button{font-family:inherit;border:none;outline:none;cursor:none}
+input,textarea,select{font-family:inherit}
+
+/* ══════════════════════════════════════
+   CURSOR  — sharp diamond + trailing ring
+   Uses CSS transforms only → GPU composited
+══════════════════════════════════════ */
+#cur-dot{
+  position:fixed;left:0;top:0;
+  width:10px;height:10px;
+  background:var(--y);
+  clip-path:polygon(50% 0%,100% 50%,50% 100%,0% 50%); /* diamond */
+  pointer-events:none;z-index:99999;
+  transform:translate(-50%,-50%);
+  will-change:transform;
+  transition:width .1s,height .1s;
+}
+#cur-ring{
+  position:fixed;left:0;top:0;
+  width:32px;height:32px;
+  border:1.5px solid rgba(245,196,0,.6);
+  border-radius:50%;
+  pointer-events:none;z-index:99998;
+  transform:translate(-50%,-50%);
+  will-change:transform;
+  transition:width .25s ease,height .25s ease,border-color .25s ease,opacity .3s;
+}
+body.c-hover #cur-dot{width:14px;height:14px}
+body.c-hover #cur-ring{width:50px;height:50px;border-color:var(--y)}
+body.c-click #cur-dot{background:#fff}
+body.c-click #cur-ring{width:20px;height:20px}
+
+/* ══════════════════════════════════════
+   TOPBAR
+══════════════════════════════════════ */
+.topbar{background:var(--y);color:#111;padding:6px 0;overflow:hidden;white-space:nowrap}
+.topbar-inner{display:inline-flex;animation:ticker 30s linear infinite;will-change:transform}
+.topbar-inner:hover{animation-play-state:paused}
+.t-item{display:inline-flex;align-items:center;gap:6px;padding:0 36px;font-size:11px;font-weight:700;letter-spacing:2px;text-transform:uppercase}
+.t-item::after{content:'//';opacity:.3;margin-left:6px}
+@keyframes ticker{0%{transform:translateX(0)}100%{transform:translateX(-50%)}}
+
+/* ══════════════════════════════════════
+   HEADER
+══════════════════════════════════════ */
+header{
+  position:sticky;top:0;z-index:900;
+  background:rgba(8,8,8,.98);
+  border-bottom:1px solid var(--border);
+  will-change:transform; /* promotes to own layer */
+}
+.hdr{max-width:1360px;margin:0 auto;padding:0 22px;height:62px;display:flex;align-items:center;gap:24px}
+
+/* Logo — text only, same bg as site */
+.logo-btn{display:flex;align-items:center;gap:0;background:none;border:none;padding:0}
+.logo-wordmark{font-family:'Bebas Neue',sans-serif;font-size:24px;letter-spacing:3px;line-height:1;color:var(--white)}
+.logo-wordmark em{color:var(--y);font-style:normal}
+.logo-sub{font-size:9px;letter-spacing:3px;color:var(--muted);text-transform:uppercase}
+
+/* Nav */
+nav{display:flex;gap:1px;flex:1}
+.nb{background:none;border:none;color:var(--muted);font-family:'Rajdhani',sans-serif;font-size:12px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;padding:8px 12px;border-radius:3px;position:relative;transition:color .14s}
+.nb::after{content:'';position:absolute;bottom:3px;left:12px;right:12px;height:2px;background:var(--y);transform:scaleX(0);transition:transform .14s;border-radius:1px}
+.nb:hover,.nb.on{color:var(--white)}.nb:hover::after,.nb.on::after{transform:scaleX(1)}
+
+/* Header right */
+.hdr-r{display:flex;align-items:center;gap:8px;margin-left:auto}
+.icon-btn{background:none;border:none;color:var(--muted);display:flex;align-items:center;gap:4px;padding:7px 8px;border-radius:3px;font-family:'Rajdhani',sans-serif;font-size:11px;font-weight:700;letter-spacing:1px;transition:color .14s;position:relative}
+.icon-btn:hover{color:var(--white)}
+.icon-btn svg{width:17px;height:17px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+.badge{background:var(--y);color:#111;font-size:9px;font-weight:700;padding:1px 4px;border-radius:8px;min-width:16px;text-align:center}
+/* single global WA button */
+.wa-hdr{background:var(--green);color:#fff;font-family:'Rajdhani',sans-serif;font-size:11px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;padding:7px 14px;border-radius:3px;display:flex;align-items:center;gap:5px;transition:background .14s}
+.wa-hdr:hover{background:#16a34a}
+.wa-hdr svg{width:13px;height:13px;fill:#fff}
+.ham-btn{display:none;background:none;border:none;color:var(--white);padding:4px}
+.ham-btn svg{width:22px;height:22px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round}
+
+/* SKU search */
+.sku-wrap{position:relative}
+.sku-wrap input{background:var(--card);border:1px solid var(--border);border-radius:3px;padding:7px 32px 7px 11px;font-size:12px;font-weight:600;color:var(--white);width:160px;outline:none;transition:border-color .14s,width .2s}
+.sku-wrap input::placeholder{color:#3a3a3a}
+.sku-wrap input:focus{border-color:var(--y);width:220px}
+.sku-wrap .si{position:absolute;right:8px;top:50%;transform:translateY(-50%);color:var(--muted);pointer-events:none}
+.sku-wrap .si svg{width:13px;height:13px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+#sr{position:absolute;top:calc(100%+5px);left:0;right:0;background:var(--bg2);border:1px solid var(--border);border-radius:3px;z-index:9999;max-height:300px;overflow-y:auto;display:none;box-shadow:0 12px 32px rgba(0,0,0,.7)}
+#sr.open{display:block}
+.sr-item{display:flex;align-items:center;gap:10px;padding:9px 12px;border-bottom:1px solid var(--border);transition:background .12s}
+.sr-item:last-child{border-bottom:none}.sr-item:hover{background:rgba(245,196,0,.07)}
+.sr-item img{width:38px;height:38px;object-fit:cover;border-radius:3px;flex-shrink:0}
+.sr-nm{font-size:12px;font-weight:700}.sr-sk{font-size:9px;letter-spacing:2px;color:var(--y);text-transform:uppercase}
+.sr-pr{font-family:'Bebas Neue',sans-serif;font-size:15px;margin-left:auto}
+.sr-empty{padding:14px;text-align:center;font-size:13px;color:var(--muted)}
+
+/* ══════════════════════════════════════
+   PAGE SYSTEM
+══════════════════════════════════════ */
+.page{display:none;min-height:70vh}
+.page.on{display:block}
+
+/* ══════════════════════════════════════
+   LAYOUT UTILS
+══════════════════════════════════════ */
+.wrap{max-width:1360px;margin:0 auto;padding:0 22px}
+.sec{padding:60px 0}
+.sec-lbl{font-size:10px;font-weight:700;letter-spacing:4px;text-transform:uppercase;color:var(--y);margin-bottom:7px;display:flex;align-items:center;gap:8px}
+.sec-lbl::before{content:'';width:20px;height:2px;background:var(--y)}
+.sec-h{font-family:'Bebas Neue',sans-serif;font-size:clamp(32px,4vw,48px);letter-spacing:2px;line-height:1}
+.sec-h span{color:var(--y)}
+.sec-row{display:flex;align-items:flex-end;justify-content:space-between;margin-bottom:36px}
+.see-all{color:var(--y);font-size:11px;font-weight:700;letter-spacing:2px;text-transform:uppercase;display:flex;align-items:center;gap:5px;transition:gap .14s}
+.see-all:hover{gap:10px}.see-all::after{content:'→'}
+
+/* ══════════════════════════════════════
+   BUTTONS
+══════════════════════════════════════ */
+.btn-y{background:var(--y);color:#111;font-family:'Rajdhani',sans-serif;font-size:12px;font-weight:700;letter-spacing:2px;text-transform:uppercase;padding:11px 26px;border-radius:var(--r);display:inline-flex;align-items:center;gap:7px;border:none;transition:background .14s,box-shadow .14s,transform .1s}
+.btn-y:hover{background:var(--yd);box-shadow:0 5px 18px rgba(245,196,0,.28);transform:translateY(-1px)}
+.btn-out{background:transparent;color:var(--white);font-family:'Rajdhani',sans-serif;font-size:12px;font-weight:700;letter-spacing:2px;text-transform:uppercase;padding:11px 26px;border-radius:var(--r);border:1px solid var(--border);display:inline-flex;align-items:center;gap:7px;transition:border-color .14s,color .14s}
+.btn-out:hover{border-color:var(--y);color:var(--y)}
+
+/* ══════════════════════════════════════
+   SCROLL REVEAL  (GPU: opacity+transform only)
+══════════════════════════════════════ */
+.rv{opacity:0;transform:translateY(22px);transition:opacity .55s ease,transform .55s ease;will-change:opacity,transform}
+.rv.vis{opacity:1;transform:none}
+.stg>*{opacity:0;transform:translateY(18px);transition:opacity .45s ease,transform .45s ease;will-change:opacity,transform}
+.stg.vis>*:nth-child(1){opacity:1;transform:none;transition-delay:.04s}
+.stg.vis>*:nth-child(2){opacity:1;transform:none;transition-delay:.10s}
+.stg.vis>*:nth-child(3){opacity:1;transform:none;transition-delay:.16s}
+.stg.vis>*:nth-child(4){opacity:1;transform:none;transition-delay:.22s}
+.stg.vis>*:nth-child(5){opacity:1;transform:none;transition-delay:.28s}
+.stg.vis>*:nth-child(6){opacity:1;transform:none;transition-delay:.34s}
+.stg.vis>*:nth-child(n+7){opacity:1;transform:none;transition-delay:.40s}
+
+/* ══════════════════════════════════════
+   HERO
+══════════════════════════════════════ */
+.hero{min-height:86vh;display:flex;align-items:center;position:relative;overflow:hidden;background:var(--bg)}
+.hero-grid{position:absolute;inset:0;background-image:linear-gradient(rgba(245,196,0,.028) 1px,transparent 1px),linear-gradient(90deg,rgba(245,196,0,.028) 1px,transparent 1px);background-size:56px 56px;pointer-events:none}
+.hero-glow{position:absolute;width:420px;height:420px;border-radius:50%;background:radial-gradient(circle,rgba(245,196,0,.1) 0%,transparent 70%);top:50%;left:36%;transform:translate(-50%,-50%);pointer-events:none}
+.hero-in{max-width:1360px;margin:0 auto;padding:0 22px;width:100%;display:grid;grid-template-columns:1fr 1fr;gap:60px;align-items:center;position:relative;z-index:1}
+.hero-tag{display:inline-flex;align-items:center;gap:7px;background:rgba(245,196,0,.09);border:1px solid rgba(245,196,0,.22);padding:5px 13px;border-radius:2px;font-size:10px;font-weight:700;letter-spacing:3px;text-transform:uppercase;color:var(--y);margin-bottom:20px}
+.dot{width:6px;height:6px;background:var(--y);border-radius:50%;animation:blink 1.6s ease-in-out infinite}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:.2}}
+.hero-h1{font-family:'Bebas Neue',sans-serif;font-size:clamp(60px,8vw,104px);line-height:.9;letter-spacing:2px;margin-bottom:16px}
+.hero-h1 .acc{color:var(--y)}
+.hero-sub{font-size:15px;color:var(--muted);line-height:1.65;margin-bottom:28px;max-width:450px}
+.hero-sub strong{color:var(--white)}
+.hero-stats{display:flex;gap:32px;margin-bottom:30px}
+.stn{font-family:'Bebas Neue',sans-serif;font-size:32px;line-height:1}
+.stn em{color:var(--y);font-style:normal}
+.stl{font-size:10px;letter-spacing:2px;text-transform:uppercase;color:var(--muted)}
+.hero-btns{display:flex;gap:11px;flex-wrap:wrap}
+/* Hero cards */
+.hcards{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.hc{background:var(--card);border:1px solid var(--border);border-radius:var(--r);overflow:hidden;position:relative;transition:border-color .18s,transform .18s,box-shadow .18s}
+.hc:hover{border-color:rgba(245,196,0,.5);transform:translateY(-4px);box-shadow:0 10px 28px rgba(245,196,0,.09)}
+.hc.big{grid-column:1/-1}
+.hc-img{aspect-ratio:16/9;overflow:hidden;background:#0d0d0d}
+.hc.big .hc-img{aspect-ratio:2.4/1}
+.hc-img img{width:100%;height:100%;object-fit:cover;transition:transform .3s;filter:brightness(.88)}
+.hc:hover .hc-img img{transform:scale(1.05);filter:brightness(1)}
+.hc-lbl{position:absolute;bottom:0;left:0;right:0;padding:10px 13px;background:linear-gradient(transparent,rgba(0,0,0,.85))}
+.hc-lbl small{font-size:9px;letter-spacing:2px;text-transform:uppercase;color:var(--y)}
+.hc-lbl span{display:block;font-family:'Bebas Neue',sans-serif;font-size:17px;letter-spacing:2px}
+.hc-hot{position:absolute;top:9px;right:9px;background:var(--y);color:#111;font-size:9px;font-weight:700;letter-spacing:1px;padding:2px 7px;border-radius:2px}
+
+/* ══════════════════════════════════════
+   FEATURES STRIP
+══════════════════════════════════════ */
+.feat-strip{background:var(--card);border-top:1px solid var(--border);border-bottom:1px solid var(--border)}
+.feat-grid{display:grid;grid-template-columns:repeat(4,1fr)}
+.feat{padding:20px 24px;display:flex;align-items:center;gap:13px;border-right:1px solid var(--border);transition:background .14s}
+.feat:last-child{border-right:none}.feat:hover{background:rgba(245,196,0,.04)}
+.feat-ico{width:38px;height:38px;background:rgba(245,196,0,.09);border:1px solid rgba(245,196,0,.18);border-radius:3px;display:flex;align-items:center;justify-content:center;flex-shrink:0;color:var(--y)}
+.feat-ico svg{width:17px;height:17px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+.feat-t{font-size:13px;font-weight:700;letter-spacing:.4px;margin-bottom:2px}
+.feat-d{font-size:11px;color:var(--muted)}
+
+/* ══════════════════════════════════════
+   PRODUCT CARD
+══════════════════════════════════════ */
+.pgrid{display:grid;grid-template-columns:repeat(4,1fr);gap:14px}
+.pc{background:var(--card);border:1px solid var(--border);border-radius:var(--r);overflow:hidden;transition:border-color .18s,transform .18s,box-shadow .18s;position:relative}
+.pc:hover{border-color:rgba(245,196,0,.38);transform:translateY(-3px);box-shadow:0 7px 22px rgba(245,196,0,.09)}
+.pc-img{aspect-ratio:1;background:#0d0d0d;overflow:hidden;position:relative}
+.pc-img img{width:100%;height:100%;object-fit:cover;transition:transform .3s}
+.pc:hover .pc-img img{transform:scale(1.05)}
+/* Overlay actions */
+.pc-acts{position:absolute;bottom:0;left:0;right:0;display:flex;gap:1px;transform:translateY(101%);transition:transform .2s ease}
+.pc:hover .pc-acts{transform:translateY(0)}
+.pa{flex:1;padding:8px 5px;background:rgba(0,0,0,.9);border-top:1px solid rgba(245,196,0,.18);color:var(--white);font-family:'Rajdhani',sans-serif;font-size:10px;font-weight:700;letter-spacing:.8px;text-transform:uppercase;transition:background .13s,color .13s}
+.pa:hover{background:var(--y);color:#111}
+.pa.main-a{flex:2.2}
+/* Badges */
+.pb{position:absolute;font-size:9px;font-weight:700;letter-spacing:1px;padding:3px 7px;border-radius:2px;top:9px}
+.pb.sale{right:9px;background:var(--y);color:#111}
+.pb.new_{left:9px;background:#22c55e;color:#fff}
+.pb.sold{left:9px;background:#333;color:var(--muted)}
+/* Info */
+.pc-info{padding:12px 13px 14px}
+.pc-sku{font-size:9px;letter-spacing:2px;text-transform:uppercase;color:var(--muted);margin-bottom:3px}
+.pc-nm{font-size:13px;font-weight:600;line-height:1.35;margin-bottom:8px;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.pc-pr{display:flex;align-items:center;gap:7px}
+.pm{font-family:'Bebas Neue',sans-serif;font-size:19px;letter-spacing:1px}
+.po{font-size:11px;color:var(--muted);text-decoration:line-through}
+.pp{font-size:9px;font-weight:700;color:var(--y);background:rgba(245,196,0,.09);padding:2px 5px;border-radius:2px}
+
+/* ══════════════════════════════════════
+   CATEGORY CARD (home strip)
+══════════════════════════════════════ */
+.cgrid{display:grid;grid-template-columns:repeat(6,1fr);gap:11px}
+.cat{background:var(--card);border:1px solid var(--border);border-radius:var(--r);overflow:hidden;transition:border-color .18s,transform .18s,box-shadow .18s;color:var(--white);display:block}
+.cat:hover{border-color:rgba(245,196,0,.42);transform:translateY(-4px);box-shadow:0 9px 24px rgba(245,196,0,.09)}
+.cat-img-w{aspect-ratio:1;overflow:hidden;background:#0d0d0d}
+.cat-img-w img{width:100%;height:100%;object-fit:cover;transition:transform .3s}
+.cat:hover .cat-img-w img{transform:scale(1.07)}
+.cat-info{padding:10px 11px 12px;border-top:1px solid var(--border)}
+.cat-nm{font-size:12px;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-bottom:1px}
+.cat-sb{font-size:9px;color:var(--y);letter-spacing:1px}
+.cat.f2{grid-column:span 2;display:grid;grid-template-columns:1fr 1.15fr}
+.cat.f2 .cat-img-w{aspect-ratio:auto}
+.cat.f2 .cat-info{border-top:none;border-left:1px solid var(--border);display:flex;flex-direction:column;justify-content:center;padding:18px 16px}
+.cat.f2 .cat-nm{font-family:'Bebas Neue',sans-serif;font-size:19px;letter-spacing:2px;white-space:normal;margin-bottom:3px}
+.cat-arr{color:var(--y);font-size:10px;font-weight:700;letter-spacing:2px;text-transform:uppercase;margin-top:8px;display:inline-flex;align-items:center;gap:5px;transition:gap .14s}
+.cat:hover .cat-arr{gap:10px}
+
+/* ══════════════════════════════════════
+   BANNER
+══════════════════════════════════════ */
+.bsplit{display:grid;grid-template-columns:2fr 1fr;gap:13px}
+.bnr{border-radius:var(--r);overflow:hidden;position:relative;transition:transform .18s}
+.bnr:hover{transform:scale(1.01)}
+.bnr img{width:100%;height:100%;object-fit:cover;display:block;min-height:200px}
+.bnr-ov{position:absolute;inset:0;background:linear-gradient(135deg,rgba(0,0,0,.68) 0%,transparent 55%);display:flex;flex-direction:column;justify-content:flex-end;padding:24px}
+.bnr-tag{font-size:9px;font-weight:700;letter-spacing:3px;text-transform:uppercase;color:var(--y);margin-bottom:5px}
+.bnr-ttl{font-family:'Bebas Neue',sans-serif;font-size:30px;letter-spacing:2px;line-height:1;margin-bottom:13px}
+
+/* ══════════════════════════════════════
+   VIDEO ROW
+══════════════════════════════════════ */
+.vid-row{display:flex;gap:12px;overflow-x:auto;padding-bottom:6px;scrollbar-width:thin;scrollbar-color:var(--y) transparent}
+.vc{flex-shrink:0;width:170px;background:var(--card);border:1px solid var(--border);border-radius:var(--r);overflow:hidden;transition:border-color .18s,transform .18s}
+.vc:hover{border-color:rgba(245,196,0,.38);transform:translateY(-3px)}
+.vc-th{aspect-ratio:9/16;overflow:hidden;background:#0d0d0d;position:relative}
+.vc-th img{width:100%;height:100%;object-fit:cover}
+.vpl{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;background:rgba(0,0,0,.26);transition:background .15s}
+.vc:hover .vpl{background:rgba(245,196,0,.16)}
+.vpl-btn{width:38px;height:38px;background:rgba(245,196,0,.9);border-radius:50%;display:flex;align-items:center;justify-content:center;transition:transform .15s}
+.vc:hover .vpl-btn{transform:scale(1.1)}
+.vpl-btn svg{width:14px;height:14px;fill:#111;margin-left:2px}
+.vc-info{padding:8px 10px 10px}
+.vc-pl{font-size:9px;font-weight:700;letter-spacing:2px;color:var(--y);margin-bottom:2px}
+.vc-ttl{font-size:10px;font-weight:600;line-height:1.4;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+
+/* ══════════════════════════════════════
+   BUILDS PAGE
+══════════════════════════════════════ */
+.ph{background:var(--bg2);border-bottom:1px solid var(--border);padding:36px 0}
+.ph-in{display:flex;align-items:center;justify-content:space-between;gap:20px;flex-wrap:wrap}
+.ph-ttl{font-family:'Bebas Neue',sans-serif;font-size:clamp(36px,5vw,58px);letter-spacing:3px;line-height:1}
+.ph-ttl span{color:var(--y)}
+.ph-sub{font-size:14px;color:var(--muted);margin-top:4px}
+.filt{display:flex;gap:7px;flex-wrap:wrap;margin-bottom:32px}
+.fb{background:var(--card);border:1px solid var(--border);color:var(--muted);font-family:'Rajdhani',sans-serif;font-size:11px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;padding:7px 16px;border-radius:3px;transition:all .14s}
+.fb:hover,.fb.on{background:var(--y);border-color:var(--y);color:#111}
+.bgrid{display:grid;grid-template-columns:repeat(3,1fr);gap:18px}
+.bcard{background:var(--card);border:1px solid var(--border);border-radius:var(--r);overflow:hidden;transition:border-color .18s,transform .18s,box-shadow .18s}
+.bcard:hover{border-color:rgba(245,196,0,.42);transform:translateY(-4px);box-shadow:0 10px 28px rgba(245,196,0,.09)}
+.bcard-img{aspect-ratio:16/10;overflow:hidden;background:#0d0d0d;position:relative}
+.bcard-img img{width:100%;height:100%;object-fit:cover;transition:transform .3s}
+.bcard:hover .bcard-img img{transform:scale(1.04)}
+.bcard-badge{position:absolute;top:10px;right:10px;font-size:9px;font-weight:700;letter-spacing:1px;padding:3px 8px;border-radius:2px}
+.bcard-body{padding:16px 17px 18px}
+.bcard-nm{font-size:13px;font-weight:700;line-height:1.35;margin-bottom:12px}
+.specs-g{display:grid;grid-template-columns:1fr 1fr;gap:5px;margin-bottom:14px}
+.spec{background:rgba(245,196,0,.04);border:1px solid rgba(245,196,0,.09);border-radius:3px;padding:5px 9px}
+.sk{font-size:8px;letter-spacing:2px;text-transform:uppercase;color:var(--muted);margin-bottom:1px}
+.sv{font-size:11px;font-weight:700}
+.bcard-ft{display:flex;align-items:center;justify-content:space-between;margin-top:14px;padding-top:12px;border-top:1px solid var(--border)}
+.bcard-pr{font-family:'Bebas Neue',sans-serif;font-size:22px}
+.bcard-pr small{font-family:'Rajdhani',sans-serif;font-size:10px;font-weight:700;letter-spacing:1px;color:var(--muted);display:block}
+.bacts{display:flex;gap:7px}
+.bact{padding:8px 14px;border-radius:3px;font-family:'Rajdhani',sans-serif;font-size:11px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;transition:all .14s}
+.bact.detail{background:transparent;color:var(--y);border:1px solid rgba(245,196,0,.28)}.bact.detail:hover{background:rgba(245,196,0,.08)}
+
+/* ══════════════════════════════════════
+   PERIPHERALS TABS — smooth fade+slide (GPU only)
+══════════════════════════════════════ */
+.ptabs{display:flex;gap:3px;border-bottom:1px solid var(--border);flex-wrap:wrap}
+.ptab{background:none;border:none;color:var(--muted);font-family:'Rajdhani',sans-serif;font-size:12px;font-weight:700;letter-spacing:2px;text-transform:uppercase;padding:10px 16px;border-bottom:2px solid transparent;margin-bottom:-1px;transition:color .14s,border-color .14s}
+.ptab:hover{color:var(--white)}.ptab.on{color:var(--white);border-bottom-color:var(--y)}
+/* Pane animation — only opacity+transform, no display toggling lag */
+.ppane{
+  opacity:0;
+  transform:translateX(14px);
+  pointer-events:none;
+  position:absolute; /* take out of flow while hidden */
+  width:100%;
+  transition:opacity .28s ease,transform .28s ease;
+}
+.ppane.on{
+  opacity:1;
+  transform:translateX(0);
+  pointer-events:all;
+  position:relative;
+}
+.panes-container{position:relative;min-height:200px;padding-top:28px}
+
+/* ══════════════════════════════════════
+   PRODUCT DETAIL PAGE
+══════════════════════════════════════ */
+.back-btn{display:inline-flex;align-items:center;gap:7px;color:var(--muted);font-size:11px;font-weight:700;letter-spacing:2px;text-transform:uppercase;padding:0;background:none;border:none;margin-bottom:26px;transition:color .14s}
+.back-btn:hover{color:var(--y)}
+.back-btn svg{width:15px;height:15px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+.detail-g{display:grid;grid-template-columns:1fr 1fr;gap:52px;align-items:start}
+.det-gal{position:sticky;top:80px}
+.det-main{aspect-ratio:1;background:var(--card);border:1px solid var(--border);border-radius:var(--r);overflow:hidden;margin-bottom:10px}
+.det-main img{width:100%;height:100%;object-fit:cover}
+.det-thumbs{display:flex;gap:7px}
+.det-th{width:60px;height:60px;background:var(--card);border:1px solid var(--border);border-radius:3px;overflow:hidden;flex-shrink:0;transition:border-color .14s}
+.det-th.on,.det-th:hover{border-color:var(--y)}
+.det-th img{width:100%;height:100%;object-fit:cover}
+.det-info{}
+.det-sku{font-size:9px;letter-spacing:3px;text-transform:uppercase;color:var(--y);margin-bottom:6px}
+.det-nm{font-family:'Bebas Neue',sans-serif;font-size:clamp(26px,3.2vw,40px);letter-spacing:2px;line-height:1;margin-bottom:12px}
+.det-stars{display:flex;align-items:center;gap:5px;color:var(--y);font-size:13px;margin-bottom:14px}
+.det-stars span{color:var(--muted);font-size:12px}
+.det-pr-row{display:flex;align-items:center;gap:11px;margin-bottom:18px}
+.det-pr{font-family:'Bebas Neue',sans-serif;font-size:34px}
+.det-pr-old{font-size:17px;color:var(--muted);text-decoration:line-through}
+.det-pct{background:var(--y);color:#111;font-size:11px;font-weight:700;padding:3px 7px;border-radius:2px}
+.det-desc{font-size:13px;color:var(--muted);line-height:1.75;margin-bottom:22px}
+/* Specs table */
+.det-spec-ttl{font-size:10px;font-weight:700;letter-spacing:3px;text-transform:uppercase;color:var(--white);margin-bottom:10px;display:flex;align-items:center;gap:8px}
+.det-spec-ttl::after{content:'';flex:1;height:1px;background:var(--border)}
+.spec-table{width:100%;border-collapse:collapse;margin-bottom:24px}
+.spec-table tr{border-bottom:1px solid var(--border)}
+.spec-table tr:last-child{border-bottom:none}
+.spec-table td{padding:8px 0;font-size:13px}
+.spec-table td:first-child{color:var(--muted);width:45%}
+.spec-table td:last-child{font-weight:700;color:var(--white)}
+/* Qty + actions */
+.qty-row{display:flex;align-items:center;gap:12px;margin-bottom:18px}
+.qty-lbl{font-size:10px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--muted)}
+.qty-c{display:flex;align-items:center;background:var(--card);border:1px solid var(--border);border-radius:3px;overflow:hidden}
+.qb{width:32px;height:32px;background:none;border:none;color:var(--white);font-size:16px;font-weight:700;transition:background .13s}.qb:hover{background:rgba(245,196,0,.09)}
+.qv{min-width:32px;height:32px;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:14px;border-left:1px solid var(--border);border-right:1px solid var(--border)}
+.det-acts{display:flex;gap:10px;flex-wrap:wrap}
+/* Fav button on detail */
+.fav-btn{background:var(--card);border:1px solid var(--border);color:var(--muted);width:42px;height:42px;border-radius:3px;display:flex;align-items:center;justify-content:center;transition:all .14s}
+.fav-btn:hover{border-color:var(--y);color:var(--y)}
+.fav-btn.faved{border-color:var(--y);color:var(--y);background:rgba(245,196,0,.08)}
+.fav-btn svg{width:18px;height:18px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;transition:fill .14s}
+.fav-btn.faved svg{fill:var(--y)}
+
+/* ══════════════════════════════════════
+   CATEGORIES PAGE (full grid)
+══════════════════════════════════════ */
+.full-cgrid{display:grid;grid-template-columns:repeat(4,1fr);gap:14px}
+.ccard{background:var(--card);border:1px solid var(--border);border-radius:var(--r);overflow:hidden;transition:border-color .18s,transform .18s,box-shadow .18s;color:var(--white)}
+.ccard:hover{border-color:rgba(245,196,0,.42);transform:translateY(-4px);box-shadow:0 9px 26px rgba(245,196,0,.09)}
+.ccard-img{aspect-ratio:4/3;overflow:hidden;background:#0d0d0d}
+.ccard-img img{width:100%;height:100%;object-fit:cover;transition:transform .3s}
+.ccard:hover .ccard-img img{transform:scale(1.06)}
+.ccard-body{padding:14px 16px 16px}
+.ccard-nm{font-family:'Bebas Neue',sans-serif;font-size:20px;letter-spacing:2px;margin-bottom:4px}
+.ccard-desc{font-size:12px;color:var(--muted);line-height:1.55;margin-bottom:10px}
+.tags{display:flex;flex-wrap:wrap;gap:5px}
+.tag{background:rgba(245,196,0,.07);border:1px solid rgba(245,196,0,.14);color:var(--y);font-size:9px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;padding:2px 7px;border-radius:2px}
+
+/* ══════════════════════════════════════
+   FAVOURITES PAGE
+══════════════════════════════════════ */
+.fav-empty{text-align:center;padding:60px 0}
+.fav-empty svg{width:48px;height:48px;stroke:var(--muted);fill:none;stroke-width:1.5;margin:0 auto 14px}
+.fav-empty p{color:var(--muted);font-size:14px;margin-bottom:20px}
+
+/* ══════════════════════════════════════
+   ABOUT
+══════════════════════════════════════ */
+.about-g{display:grid;grid-template-columns:1fr 1fr;gap:60px;align-items:center}
+.about-img{border-radius:var(--r);overflow:hidden;border:1px solid var(--border);position:relative}
+.about-img img{width:100%;display:block;filter:brightness(.83)}
+.about-badge{position:absolute;bottom:16px;left:16px;background:var(--y);color:#111;padding:9px 13px;border-radius:3px}
+.about-badge span{font-family:'Bebas Neue',sans-serif;font-size:18px;letter-spacing:2px;display:block;line-height:1}
+.about-badge small{font-size:9px;font-weight:700;letter-spacing:2px;text-transform:uppercase}
+.about-body p{font-size:13px;color:var(--muted);line-height:1.75;margin-bottom:13px}
+.about-body p strong{color:var(--white)}
+.astats{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin:24px 0}
+.astat{background:var(--card);border:1px solid var(--border);border-radius:var(--r);padding:16px 12px;text-align:center}
+.astat-n{font-family:'Bebas Neue',sans-serif;font-size:30px;color:var(--y);line-height:1}
+.astat-l{font-size:9px;letter-spacing:2px;text-transform:uppercase;color:var(--muted);margin-top:3px}
+.why-g{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-top:48px}
+.why{background:var(--card);border:1px solid var(--border);border-radius:var(--r);padding:22px}
+.why-em{font-size:24px;margin-bottom:9px}
+.why-t{font-family:'Bebas Neue',sans-serif;font-size:17px;letter-spacing:2px;color:var(--y);margin-bottom:6px}
+.why-d{font-size:12px;color:var(--muted);line-height:1.65}
+
+/* ══════════════════════════════════════
+   CONTACT
+══════════════════════════════════════ */
+.contact-g{display:grid;grid-template-columns:1fr 1.35fr;gap:44px;align-items:start}
+.citem{background:var(--card);border:1px solid var(--border);border-radius:var(--r);padding:16px 18px;display:flex;align-items:flex-start;gap:13px;margin-bottom:11px;transition:border-color .14s}
+.citem:hover{border-color:rgba(245,196,0,.28)}
+.ci-ico{width:38px;height:38px;background:rgba(245,196,0,.09);border:1px solid rgba(245,196,0,.18);border-radius:3px;display:flex;align-items:center;justify-content:center;flex-shrink:0;color:var(--y)}
+.ci-ico svg{width:16px;height:16px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+.ci-lbl{font-size:9px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--muted);margin-bottom:3px}
+.ci-val{font-size:13px;font-weight:600}
+.ci-val a{color:var(--white);transition:color .14s}.ci-val a:hover{color:var(--y)}
+.soc-row{display:flex;gap:7px;margin-top:8px}
+.soc{width:32px;height:32px;background:var(--card);border:1px solid var(--border);border-radius:3px;display:flex;align-items:center;justify-content:center;color:var(--muted);transition:all .14s}
+.soc:hover{background:var(--y);border-color:var(--y);color:#111}
+.soc svg{width:14px;height:14px;fill:currentColor}
+.map-box{background:var(--card);border:1px solid var(--border);border-radius:var(--r);overflow:hidden;margin-top:11px}
+.map-box iframe{width:100%;height:280px;border:none;filter:grayscale(.4) contrast(1.1)}
+.map-ft{padding:10px 16px;border-top:1px solid var(--border);display:flex;align-items:center;gap:8px}
+.map-dot{width:6px;height:6px;background:var(--y);border-radius:50%;animation:blink 1.6s ease-in-out infinite;flex-shrink:0}
+.map-addr{font-size:11px;font-weight:700;color:var(--muted)}
+.c-form{background:var(--card);border:1px solid var(--border);border-radius:var(--r);padding:26px}
+.c-form-ttl{font-family:'Bebas Neue',sans-serif;font-size:26px;letter-spacing:2px;margin-bottom:20px}
+.c-form-ttl span{color:var(--y)}
+.fg{display:flex;flex-direction:column;gap:5px;margin-bottom:11px}
+.fl{font-size:9px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--muted)}
+.fi,.fsel,.fta{background:var(--bg);border:1px solid var(--border);border-radius:3px;padding:9px 12px;font-family:'Rajdhani',sans-serif;font-size:13px;font-weight:500;color:var(--white);outline:none;transition:border-color .14s;width:100%}
+.fi::placeholder,.fta::placeholder{color:#333}.fi:focus,.fsel:focus,.fta:focus{border-color:var(--y)}
+.fsel{appearance:none}.fsel option{background:var(--bg2)}
+.fta{resize:vertical;min-height:90px}
+.frow{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:11px}
+.fsub{width:100%;padding:12px;font-family:'Rajdhani',sans-serif;font-size:13px;font-weight:700;letter-spacing:2px;text-transform:uppercase;background:var(--y);color:#111;border:none;border-radius:3px;transition:background .14s,box-shadow .14s}
+.fsub:hover{background:var(--yd);box-shadow:0 5px 16px rgba(245,196,0,.28)}
+
+/* ══════════════════════════════════════
+   CART DRAWER
+══════════════════════════════════════ */
+.cart-ov{position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:1200;opacity:0;pointer-events:none;transition:opacity .22s}
+.cart-ov.on{opacity:1;pointer-events:all}
+.cart-dr{position:fixed;top:0;right:0;bottom:0;width:390px;max-width:100%;background:var(--bg2);border-left:1px solid var(--border);z-index:1201;transform:translateX(100%);transition:transform .25s ease;display:flex;flex-direction:column}
+.cart-dr.on{transform:translateX(0)}
+.cart-hd{padding:18px 20px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between}
+.cart-hdtl{font-family:'Bebas Neue',sans-serif;font-size:20px;letter-spacing:2px}
+.cart-hdtl span{color:var(--y)}
+.cart-x{background:none;border:none;color:var(--muted);font-size:20px;line-height:1;padding:3px;transition:color .13s}.cart-x:hover{color:var(--white)}
+.cart-bd{flex:1;overflow-y:auto;padding:14px 20px}
+.cart-empty{text-align:center;padding:48px 0}
+.cart-empty svg{width:44px;height:44px;stroke:var(--muted);fill:none;stroke-width:1.5;margin:0 auto 12px}
+.cart-empty p{color:var(--muted);font-size:13px}
+.ci-row{display:flex;gap:11px;padding:12px 0;border-bottom:1px solid var(--border);align-items:flex-start}
+.ci-row img{width:56px;height:56px;object-fit:cover;border-radius:3px;flex-shrink:0;background:var(--card)}
+.ci-info{flex:1}
+.ci-nm{font-size:12px;font-weight:700;line-height:1.3;margin-bottom:4px}
+.ci-sk{font-size:9px;letter-spacing:2px;text-transform:uppercase;color:var(--y);margin-bottom:5px}
+.ci-btm{display:flex;align-items:center;gap:10px}
+.ci-pr{font-family:'Bebas Neue',sans-serif;font-size:17px}
+.cqty{display:flex;align-items:center;background:var(--card);border:1px solid var(--border);border-radius:3px;overflow:hidden}
+.cqb{width:26px;height:26px;background:none;border:none;color:var(--white);font-size:14px;line-height:1;transition:background .12s}.cqb:hover{background:rgba(245,196,0,.09)}
+.cqv{min-width:26px;height:26px;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;border-left:1px solid var(--border);border-right:1px solid var(--border)}
+.ci-rm{margin-left:auto;background:none;border:none;color:var(--muted);font-size:17px;line-height:1;padding:3px;transition:color .12s}.ci-rm:hover{color:#ef4444}
+.cart-ft{padding:16px 20px;border-top:1px solid var(--border)}
+.cart-sub{display:flex;justify-content:space-between;align-items:center;margin-bottom:14px}
+.cart-sub span{font-size:12px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--muted)}
+.cart-sub strong{font-family:'Bebas Neue',sans-serif;font-size:22px}
+.co-btn{width:100%;padding:13px;background:var(--y);color:#111;font-family:'Rajdhani',sans-serif;font-size:13px;font-weight:700;letter-spacing:2px;text-transform:uppercase;border:none;border-radius:3px;transition:background .14s;margin-bottom:9px}
+.co-btn:hover{background:var(--yd)}
+
+/* ══════════════════════════════════════
+   CHECKOUT MODAL
+══════════════════════════════════════ */
+.modal-ov{position:fixed;inset:0;background:rgba(0,0,0,.72);z-index:1300;display:flex;align-items:center;justify-content:center;padding:20px;opacity:0;pointer-events:none;transition:opacity .22s}
+.modal-ov.on{opacity:1;pointer-events:all}
+.modal{background:var(--bg2);border:1px solid var(--border);border-radius:var(--r);padding:30px;width:100%;max-width:500px;max-height:90vh;overflow-y:auto;position:relative;transform:translateY(18px);transition:transform .22s}
+.modal-ov.on .modal{transform:translateY(0)}
+.modal-ttl{font-family:'Bebas Neue',sans-serif;font-size:26px;letter-spacing:2px;margin-bottom:4px}
+.modal-ttl span{color:var(--y)}
+.modal-sub{font-size:12px;color:var(--muted);margin-bottom:20px}
+.modal-x{position:absolute;top:12px;right:14px;background:none;border:none;color:var(--muted);font-size:20px}
+
+/* ══════════════════════════════════════
+   MOBILE DRAWER
+══════════════════════════════════════ */
+.ndrawer{position:fixed;inset:0;z-index:1100;pointer-events:none}
+.ndrawer-bg{position:absolute;inset:0;background:rgba(0,0,0,.6);opacity:0;transition:opacity .22s}
+.ndrawer-panel{position:absolute;top:0;left:0;bottom:0;width:252px;background:var(--bg2);border-right:1px solid var(--border);transform:translateX(-100%);transition:transform .22s;padding:18px 0;display:flex;flex-direction:column;gap:2px}
+.ndrawer.on{pointer-events:all}
+.ndrawer.on .ndrawer-bg{opacity:1}
+.ndrawer.on .ndrawer-panel{transform:translateX(0)}
+.ndrawer-logo{padding:0 18px 16px;border-bottom:1px solid var(--border);margin-bottom:5px;display:flex;align-items:center;gap:8px}
+.dnb{display:block;padding:12px 20px;color:var(--muted);font-family:'Rajdhani',sans-serif;font-size:13px;font-weight:700;letter-spacing:2px;text-transform:uppercase;background:none;border:none;text-align:left;width:100%;transition:color .14s,background .14s}
+.dnb:hover,.dnb.on{color:var(--y);background:rgba(245,196,0,.05)}
+
+/* ══════════════════════════════════════
+   FOOTER
+══════════════════════════════════════ */
+footer{background:#050505;border-top:1px solid var(--border);padding:48px 0 22px}
+.foot-g{display:grid;grid-template-columns:1.5fr 1fr 1fr 1fr;gap:44px;margin-bottom:40px}
+.foot-logo{display:flex;align-items:center;gap:9px;margin-bottom:13px}
+.foot-desc{font-size:12px;color:var(--muted);line-height:1.7;margin-bottom:16px}
+.fc-ttl{font-size:9px;font-weight:700;letter-spacing:3px;text-transform:uppercase;color:var(--white);margin-bottom:14px;display:flex;align-items:center;gap:7px}
+.fc-ttl::after{content:'';flex:1;height:1px;background:var(--border)}
+.fl-list{list-style:none;display:flex;flex-direction:column;gap:8px}
+.fl-list a{color:var(--muted);font-size:12px;transition:color .14s;display:flex;align-items:center;gap:5px}
+.fl-list a::before{content:'//';font-size:8px;color:var(--y);opacity:.32;transition:opacity .14s}
+.fl-list a:hover{color:var(--white)}.fl-list a:hover::before{opacity:1}
+.foot-bt{border-top:1px solid var(--border);padding-top:18px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px}
+.foot-copy{font-size:11px;color:var(--muted)}
+.foot-copy span{color:var(--y)}
+.ppills{display:flex;gap:5px;flex-wrap:wrap}
+.ppill{background:var(--card);border:1px solid var(--border);border-radius:3px;padding:3px 8px;font-size:9px;font-weight:700;letter-spacing:1px;color:var(--muted)}
+
+/* Float WA */
+.float-wa{position:fixed;bottom:20px;right:20px;z-index:899;width:48px;height:48px;background:var(--green);border-radius:50%;display:flex;align-items:center;justify-content:center;box-shadow:0 5px 18px rgba(34,197,94,.38);transition:transform .18s,box-shadow .18s}
+.float-wa:hover{transform:scale(1.08);box-shadow:0 9px 26px rgba(34,197,94,.46)}
+.float-wa svg{width:22px;height:22px;fill:#fff}
+
+/* ══════════════════════════════════════
+   RESPONSIVE
+══════════════════════════════════════ */
+@media(max-width:1100px){
+  .hero-in{grid-template-columns:1fr}.hcards{display:none}
+  .cgrid{grid-template-columns:repeat(3,1fr)}.cat.f2{grid-column:span 3}
+  .pgrid{grid-template-columns:repeat(3,1fr)}
+  .bgrid{grid-template-columns:repeat(2,1fr)}
+  .full-cgrid{grid-template-columns:repeat(3,1fr)}
+  .about-g{grid-template-columns:1fr}.contact-g{grid-template-columns:1fr}
+  .detail-g{grid-template-columns:1fr}.det-gal{position:static}
+  .foot-g{grid-template-columns:1fr 1fr;gap:28px}
+}
+@media(max-width:768px){
+  nav{display:none}.ham-btn{display:flex}
+  .wa-hdr .wa-t{display:none}
+  .feat-grid{grid-template-columns:1fr 1fr}
+  .cgrid{grid-template-columns:repeat(2,1fr)}.cat.f2{grid-column:span 2}
+  .pgrid{grid-template-columns:repeat(2,1fr)}
+  .bgrid{grid-template-columns:1fr}
+  .full-cgrid{grid-template-columns:repeat(2,1fr)}
+  .bsplit{grid-template-columns:1fr}
+  .why-g{grid-template-columns:1fr 1fr}
+  .foot-g{grid-template-columns:1fr}
+  .foot-bt{flex-direction:column}
+  .frow{grid-template-columns:1fr}
+  .sec{padding:44px 0}
+}
+</style>
+</head>
+<body>
+
+<!-- ══ CURSOR ══ -->
+<div id="cur-dot"></div>
+<div id="cur-ring"></div>
+
+<!-- ══ TOPBAR ══ -->
+<div class="topbar">
+  <div class="topbar-inner">
+    <span class="t-item">🔥 Azadi Sale — Up to 40% OFF</span>
+    <span class="t-item">📦 Delivery All Over Pakistan</span>
+    <span class="t-item">💳 50% Advance to Confirm</span>
+    <span class="t-item">📞 0311-5226682</span>
+    <span class="t-item">RTX 5080 In Stock</span>
+    <span class="t-item">Free Rs.10K–15K Accessories on Every Build</span>
+    <span class="t-item">🔥 Azadi Sale — Up to 40% OFF</span>
+    <span class="t-item">📦 Delivery All Over Pakistan</span>
+    <span class="t-item">💳 50% Advance to Confirm</span>
+    <span class="t-item">📞 0311-5226682</span>
+    <span class="t-item">RTX 5080 In Stock</span>
+    <span class="t-item">Free Rs.10K–15K Accessories on Every Build</span>
+  </div>
+</div>
+
+<!-- ══ HEADER ══ -->
+<header>
+  <div class="hdr">
+    <button class="ham-btn" id="hamBtn"><svg viewBox="0 0 24 24"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg></button>
+    <!-- Logo: text only, no hex badge -->
+    <button class="logo-btn" onclick="go('home')">
+      <div>
+        <div class="logo-wordmark">Daddu<em>Charger</em></div>
+        <div class="logo-sub">Gaming Store · Rawalpindi</div>
+      </div>
+    </button>
+    <nav>
+      <button class="nb on" data-p="home"        onclick="go('home')">Home</button>
+      <button class="nb"    data-p="builds"      onclick="go('builds')">Builds</button>
+      <button class="nb"    data-p="peripherals" onclick="go('peripherals')">Peripherals</button>
+      <button class="nb"    data-p="categories"  onclick="go('categories')">Categories</button>
+      <button class="nb"    data-p="about"       onclick="go('about')">About</button>
+      <button class="nb"    data-p="contact"     onclick="go('contact')">Contact</button>
+    </nav>
+    <div class="hdr-r">
+      <!-- SKU Search -->
+      <div class="sku-wrap">
+        <input id="skuQ" type="text" placeholder="Search SKU…" autocomplete="off">
+        <span class="si"><svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg></span>
+        <div id="sr"></div>
+      </div>
+      <!-- Favourites -->
+      <button class="icon-btn" onclick="go('favourites')" title="Favourites">
+        <svg viewBox="0 0 24 24"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
+        <span class="badge" id="favCount">0</span>
+      </button>
+      <!-- Cart -->
+      <button class="icon-btn" id="cartBtn" title="Cart">
+        <svg viewBox="0 0 24 24"><path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 0 1-8 0"/></svg>
+        <span class="badge" id="cartCount">0</span>
+      </button>
+      <!-- Single global WA button -->
+      <a href="https://wa.me/923115226682" target="_blank" class="wa-hdr">
+        <svg viewBox="0 0 24 24"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 0 1-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 0 1-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 0 1 2.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0 0 12.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 0 0 5.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 0 0-3.48-8.413Z"/></svg>
+        <span class="wa-t">WhatsApp</span>
+      </a>
+    </div>
+  </div>
+</header>
+
+<!-- ══ MOBILE DRAWER ══ -->
+<div class="ndrawer" id="nd">
+  <div class="ndrawer-bg" onclick="closeDrawer()"></div>
+  <div class="ndrawer-panel">
+    <div class="ndrawer-logo">
+      <div><div class="logo-wordmark" style="font-size:20px">Daddu<em>Charger</em></div><div class="logo-sub">Gaming Store</div></div>
+    </div>
+    <button class="dnb on" onclick="go('home');closeDrawer()">Home</button>
+    <button class="dnb" onclick="go('builds');closeDrawer()">Builds</button>
+    <button class="dnb" onclick="go('peripherals');closeDrawer()">Peripherals</button>
+    <button class="dnb" onclick="go('categories');closeDrawer()">Categories</button>
+    <button class="dnb" onclick="go('favourites');closeDrawer()">Favourites</button>
+    <button class="dnb" onclick="go('about');closeDrawer()">About</button>
+    <button class="dnb" onclick="go('contact');closeDrawer()">Contact</button>
+  </div>
+</div>
+
+<!-- ══ CART DRAWER ══ -->
+<div class="cart-ov" id="cartOv" onclick="closeCart()"></div>
+<div class="cart-dr" id="cartDr">
+  <div class="cart-hd">
+    <div class="cart-hdtl">Your <span>Cart</span></div>
+    <button class="cart-x" onclick="closeCart()">✕</button>
+  </div>
+  <div class="cart-bd" id="cartBd">
+    <div class="cart-empty" id="cartEmptyMsg">
+      <svg viewBox="0 0 24 24"><path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 0 1-8 0"/></svg>
+      <p>Cart is empty. Add products to get started.</p>
+    </div>
+    <div id="cartItems"></div>
+  </div>
+  <div class="cart-ft" id="cartFt" style="display:none">
+    <div class="cart-sub"><span>Subtotal</span><strong id="cartTotal">Rs.0</strong></div>
+    <button class="co-btn" onclick="openCheckout()">Proceed to Checkout →</button>
+    <p style="font-size:10px;color:var(--muted);text-align:center">50% advance required · All over Pakistan</p>
+  </div>
+</div>
+
+<!-- ══ CHECKOUT MODAL ══ -->
+<div class="modal-ov" id="coModal">
+  <div class="modal">
+    <button class="modal-x" onclick="closeCheckout()">✕</button>
+    <div class="modal-ttl">Complete <span>Order</span></div>
+    <p class="modal-sub">Fill in details — order email auto-sent to dadduchargergs@gmail.com</p>
+    <div class="fg"><label class="fl">Full Name *</label><input class="fi" id="co-name" type="text" placeholder="Ahmed Khan"></div>
+    <div class="fg"><label class="fl">Email *</label><input class="fi" id="co-email" type="email" placeholder="you@email.com"></div>
+    <div class="fg"><label class="fl">Phone / WhatsApp *</label><input class="fi" id="co-phone" type="tel" placeholder="0311-XXXXXXX"></div>
+    <div class="fg"><label class="fl">Delivery Address *</label><textarea class="fta" id="co-addr" rows="3" placeholder="House #, Street, City"></textarea></div>
+    <div class="fg"><label class="fl">Payment</label>
+      <select class="fi fsel" id="co-pay">
+        <option>50% Advance – JazzCash/EasyPaisa</option>
+        <option>50% Advance – Bank Transfer</option>
+        <option>Cash on Delivery</option>
+      </select>
+    </div>
+    <div id="co-summary" style="background:var(--bg);border:1px solid var(--border);border-radius:3px;padding:12px;margin-bottom:16px;font-size:12px"></div>
+    <button class="fsub" onclick="submitOrder()">Place Order & Send Details</button>
+    <p style="font-size:10px;color:var(--muted);text-align:center;margin-top:7px">Order sent to owner's email + WhatsApp confirmation</p>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════
+     PAGES
+══════════════════════════════════════ -->
+
+<!-- ══ HOME ══ -->
+<div class="page on" id="page-home">
+  <div class="hero">
+    <div class="hero-grid"></div>
+    <div class="hero-glow"></div>
+    <div class="hero-in">
+      <div class="rv">
+        <div class="hero-tag"><span class="dot"></span>Pakistan's Premier Gaming Store</div>
+        <h1 class="hero-h1">LEVEL<br>UP YOUR<br><span class="acc">SETUP</span></h1>
+        <p class="hero-sub">Custom PC builds, premium peripherals &amp; the latest gear.<br><strong>Royal Plaza, 6th Road, Satellite Town, Rawalpindi.</strong></p>
+        <div class="hero-stats stg">
+          <div><div class="stn">340<em>K+</em></div><div class="stl">Followers</div></div>
+          <div><div class="stn">5<em>yrs</em></div><div class="stl">Experience</div></div>
+          <div><div class="stn">1.4<em>M</em></div><div class="stl">Top Build PKR</div></div>
+        </div>
+        <div class="hero-btns">
+          <button class="btn-y" onclick="go('builds')">View PC Builds →</button>
+          <a href="https://wa.me/923115226682" target="_blank" class="btn-out">Get Custom Quote</a>
+        </div>
+      </div>
+      <div class="hcards rv" style="transition-delay:.12s">
+        <div class="hc big"><div class="hc-img"><img src="https://www.dadducharger.com/cdn/shop/files/1.png?v=1759181378&width=900" alt="Build" loading="lazy"></div><div class="hc-lbl"><small>Featured Build</small><span>Ryzen 9 9950X3D</span></div><div class="hc-hot">HOT</div></div>
+        <div class="hc"><div class="hc-img"><img src="https://www.dadducharger.com/cdn/shop/files/Q27G4_62d380ab-8e2c-4cc2-b6b0-2e45deefc105.webp?v=1749030782&width=400" alt="Monitor" loading="lazy"></div><div class="hc-lbl"><small>Monitors 15% Off</small><span>4K Gaming</span></div></div>
+        <div class="hc"><div class="hc-img"><img src="https://www.dadducharger.com/cdn/shop/files/ROG-Astral-GeForce-RTX_-5090-32GB-GDDR7-OC-Edition-Graphics-Card-04_96b447dd-cfc5-4406-a342-636af10286a6.jpg?v=1760192608&width=400" alt="RTX5090" loading="lazy"></div><div class="hc-lbl"><small>New Arrival</small><span>RTX 5090</span></div></div>
+      </div>
+    </div>
+  </div>
+  <!-- features -->
+  <div class="feat-strip"><div class="wrap"><div class="feat-grid stg rv">
+    <div class="feat"><div class="feat-ico"><svg viewBox="0 0 24 24"><path d="M5 12h14M12 5l7 7-7 7"/></svg></div><div><div class="feat-t">Nationwide Delivery</div><div class="feat-d">All over Pakistan</div></div></div>
+    <div class="feat"><div class="feat-ico"><svg viewBox="0 0 24 24"><path d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0 1 12 2.944a11.955 11.955 0 0 1-8.618 3.04A12.02 12.02 0 0 0 3 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/></svg></div><div><div class="feat-t">100% Genuine</div><div class="feat-d">Authentic hardware only</div></div></div>
+    <div class="feat"><div class="feat-ico"><svg viewBox="0 0 24 24"><path d="M18.364 5.636l-3.536 3.536m0 5.656l3.536 3.536M9.172 9.172L5.636 5.636m3.536 9.192l-3.536 3.536M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0zm-5 0a4 4 0 1 1-8 0 4 4 0 0 1 8 0z"/></svg></div><div><div class="feat-t">Expert Support</div><div class="feat-d">Build consulting &amp; after-sales</div></div></div>
+    <div class="feat"><div class="feat-ico"><svg viewBox="0 0 24 24"><path d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 0 0 3-3V8a3 3 0 0 0-3-3H6a3 3 0 0 0-3 3v8a3 3 0 0 0 3 3z"/></svg></div><div><div class="feat-t">50% Advance</div><div class="feat-d">Secure your order</div></div></div>
+  </div></div></div>
+  <!-- categories -->
+  <div class="sec"><div class="wrap">
+    <div class="sec-row rv"><div><div class="sec-lbl">Browse by Type</div><h2 class="sec-h">Shop <span>Categories</span></h2></div><button class="see-all" onclick="go('categories')">All Categories</button></div>
+    <div class="cgrid stg rv">
+      <button class="cat f2" onclick="go('categories')"><div class="cat-img-w"><img src="https://www.dadducharger.com/cdn/shop/files/ROG-Astral-GeForce-RTX_-5090-32GB-GDDR7-OC-Edition-Graphics-Card-04_96b447dd-cfc5-4406-a342-636af10286a6.jpg?v=1760192608&width=500" alt="GPU" loading="lazy"></div><div class="cat-info"><div class="cat-nm">New Graphics Cards</div><div class="cat-sb">RTX 5090 · RTX 5080 · RTX 5070</div><span class="cat-arr">Shop Now</span></div></button>
+      <button class="cat" onclick="go('peripherals')"><div class="cat-img-w"><img src="https://www.dadducharger.com/cdn/shop/files/Q27G4_62d380ab-8e2c-4cc2-b6b0-2e45deefc105.webp?v=1749030782&width=400" alt="Monitor" loading="lazy"></div><div class="cat-info"><div class="cat-nm">Gaming Monitors</div><div class="cat-sb">24"–49" Curved</div></div></button>
+      <button class="cat" onclick="go('peripherals')"><div class="cat-img-w"><img src="https://www.dadducharger.com/cdn/shop/files/cn-11134207-7r98o-lz4nb56wi8ab97_eb14bca5-31bb-4016-aeb7-317928a2c40b.jpg?v=1760048019&width=400" alt="Keyboard" loading="lazy"></div><div class="cat-info"><div class="cat-nm">Keyboards</div><div class="cat-sb">Mechanical · HE Switch</div></div></button>
+      <button class="cat" onclick="go('peripherals')"><div class="cat-img-w"><img src="https://www.dadducharger.com/cdn/shop/files/Untitled_design_3_9fa19b6a-8aaf-4d7c-809e-bc5c40a49e4d.png?v=1761354358&width=400" alt="Mouse" loading="lazy"></div><div class="cat-info"><div class="cat-nm">Gaming Mouse</div><div class="cat-sb">Wired · Wireless</div></div></button>
+      <button class="cat" onclick="switchTab('chairs');go('peripherals')"><div class="cat-img-w"><img src="https://www.dadducharger.com/cdn/shop/files/MXG-GCH-01-Large-Diamound-Quilted-PU-with-Headrest-and-Lumbar-Support-Gaming-Chair-Red-Black-Price-in-Pakistan-450x450-1.jpg?v=1761218774&width=400" alt="Chair" loading="lazy"></div><div class="cat-info"><div class="cat-nm">Gaming Chairs</div><div class="cat-sb">Ergonomic</div></div></button>
+      <button class="cat" onclick="switchTab('headphones');go('peripherals')"><div class="cat-img-w"><img src="https://www.dadducharger.com/cdn/shop/files/IMG_6790.jpg?v=1761218682&width=400" alt="Headphones" loading="lazy"></div><div class="cat-info"><div class="cat-nm">Headphones</div><div class="cat-sb">Gaming · Studio</div></div></button>
+    </div>
+  </div></div>
+  <!-- banners -->
+  <div class="sec" style="padding-top:0"><div class="wrap"><div class="bsplit rv">
+    <div class="bnr" onclick="go('builds')"><img src="https://www.dadducharger.com/cdn/shop/files/Website_Banner_Final.png?v=1759181530&width=900" alt="Sale" loading="lazy"><div class="bnr-ov"><div class="bnr-tag">Limited Time</div><div class="bnr-ttl">AZADI SALE<br>40% OFF</div><button class="btn-y" onclick="event.stopPropagation();go('builds')">Shop Now →</button></div></div>
+    <div class="bnr" onclick="location.href='https://wa.me/923115226682'"><img src="https://www.dadducharger.com/cdn/shop/files/Website_Banner_Final_78569c9e-6a29-4a89-a625-1812216564a6.png?v=1769516191&width=600" alt="Builds" loading="lazy"><div class="bnr-ov"><div class="bnr-tag">Custom PC</div><div class="bnr-ttl">BUILD YOUR<br>DREAM RIG</div><button class="btn-y" onclick="event.stopPropagation();location.href='https://wa.me/923115226682'">Get Quote →</button></div></div>
+  </div></div></div>
+  <!-- featured products -->
+  <div class="sec" style="background:var(--bg2)"><div class="wrap">
+    <div class="sec-row rv"><div><div class="sec-lbl">Best Sellers</div><h2 class="sec-h">Featured <span>Products</span></h2></div><button class="see-all" onclick="go('peripherals')">All Products</button></div>
+    <div class="pgrid stg rv" id="featGrid"></div>
+  </div></div>
+  <!-- videos -->
+  <div class="sec"><div class="wrap">
+    <div class="sec-row rv"><div><div class="sec-lbl">TikTok · Instagram · YouTube</div><h2 class="sec-h">Our <span>Videos</span></h2></div><a href="https://tiktok.com/@dadducharger" target="_blank" class="see-all">Follow Us</a></div>
+    <div class="vid-row rv">
+      <div class="vc"><div class="vc-th"><img src="https://cdn.shopify.com/s/files/1/0679/7325/1226/files/preview_images/93797bda5ea84b2c9852a2316070abcc.thumbnail.0000000000.jpg?v=1760028013&width=240" loading="lazy" alt="v"><div class="vpl"><div class="vpl-btn"><svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg></div></div></div><div class="vc-info"><div class="vc-pl">▶ TikTok</div><div class="vc-ttl">340K Gaming PC Build 🚀</div></div></div>
+      <div class="vc"><div class="vc-th"><img src="https://cdn.shopify.com/s/files/1/0679/7325/1226/files/preview_images/a1cb0b632a7948909e94cad0cf3e71be.thumbnail.0000000000.jpg?v=1760027740&width=240" loading="lazy" alt="v"><div class="vpl"><div class="vpl-btn"><svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg></div></div></div><div class="vc-info"><div class="vc-pl">▶ TikTok</div><div class="vc-ttl">Pac-Man Custom PC 🎮</div></div></div>
+      <div class="vc"><div class="vc-th"><img src="https://cdn.shopify.com/s/files/1/0679/7325/1226/files/preview_images/b44467ba25e74da49177aa0c6ebc926a.thumbnail.0000000000.jpg?v=1760027677&width=240" loading="lazy" alt="v"><div class="vpl"><div class="vpl-btn"><svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg></div></div></div><div class="vc-info"><div class="vc-pl">▶ YouTube</div><div class="vc-ttl">320K DDR5 Gaming PC 🔥</div></div></div>
+      <div class="vc"><div class="vc-th"><img src="https://cdn.shopify.com/s/files/1/0679/7325/1226/files/preview_images/9fc5858d46824303ade22280b3674cbf.thumbnail.0000000000.jpg?v=1760027613&width=240" loading="lazy" alt="v"><div class="vpl"><div class="vpl-btn"><svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg></div></div></div><div class="vc-info"><div class="vc-pl">▶ Instagram</div><div class="vc-ttl">New Headphones 🎧</div></div></div>
+      <div class="vc"><div class="vc-th"><img src="https://cdn.shopify.com/s/files/1/0679/7325/1226/files/preview_images/6c3f5127548642aa93f628f1e4a1963d.thumbnail.0000000000.jpg?v=1760027569&width=240" loading="lazy" alt="v"><div class="vpl"><div class="vpl-btn"><svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg></div></div></div><div class="vc-info"><div class="vc-pl">▶ TikTok</div><div class="vc-ttl">14 Lakh Gaming PC ⚡</div></div></div>
+      <div class="vc"><div class="vc-th"><img src="https://cdn.shopify.com/s/files/1/0679/7325/1226/files/preview_images/672bf941693f47959382b0bb1551b3f7.thumbnail.0000000000.jpg?v=1760027411&width=240" loading="lazy" alt="v"><div class="vpl"><div class="vpl-btn"><svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg></div></div></div><div class="vc-info"><div class="vc-pl">▶ YouTube</div><div class="vc-ttl">1.2M RTX 5080 Beast 💛</div></div></div>
+    </div>
+  </div></div>
+</div>
+
+<!-- ══ BUILDS ══ -->
+<div class="page" id="page-builds">
+  <div class="ph"><div class="wrap"><div class="ph-in"><div><div class="sec-lbl">Ready to Ship</div><div class="ph-ttl">Custom PC <span>Builds</span></div><div class="ph-sub">Hand-built in Rawalpindi · WhatsApp for custom configs</div></div></div></div></div>
+  <div class="sec"><div class="wrap"><div class="filt" id="bFilt">
+    <button class="fb on" onclick="filterBuilds(this,'all')">All</button>
+    <button class="fb" onclick="filterBuilds(this,'budget')">Budget (&lt;300K)</button>
+    <button class="fb" onclick="filterBuilds(this,'mid')">Mid-Range</button>
+    <button class="fb" onclick="filterBuilds(this,'high')">High-End (700K+)</button>
+  </div><div class="bgrid stg" id="buildGrid"></div></div></div>
+</div>
+
+<!-- ══ PERIPHERALS ══ -->
+<div class="page" id="page-peripherals">
+  <div class="ph"><div class="wrap"><div class="ph-in"><div><div class="sec-lbl">Gaming Gear</div><div class="ph-ttl">Peripherals &amp; <span>Accessories</span></div><div class="ph-sub">Click any product to see full specs &amp; description</div></div></div></div></div>
+  <div class="sec"><div class="wrap">
+    <div class="ptabs" id="periTabs">
+      <button class="ptab on" onclick="switchTab('keyboards')">Keyboards</button>
+      <button class="ptab"    onclick="switchTab('mice')">Mice</button>
+      <button class="ptab"    onclick="switchTab('chairs')">Chairs</button>
+      <button class="ptab"    onclick="switchTab('headphones')">Headphones</button>
+      <button class="ptab"    onclick="switchTab('monitors')">Monitors</button>
+      <button class="ptab"    onclick="switchTab('controllers')">Controllers</button>
+    </div>
+    <div class="panes-container">
+      <div class="ppane on" id="pane-keyboards"><div class="pgrid stg" id="grid-keyboards"></div></div>
+      <div class="ppane" id="pane-mice"><div class="pgrid stg" id="grid-mice"></div></div>
+      <div class="ppane" id="pane-chairs"><div class="pgrid stg" id="grid-chairs"></div></div>
+      <div class="ppane" id="pane-headphones"><div class="pgrid stg" id="grid-headphones"></div></div>
+      <div class="ppane" id="pane-monitors"><div class="pgrid stg" id="grid-monitors"></div></div>
+      <div class="ppane" id="pane-controllers"><div class="pgrid stg" id="grid-controllers"></div></div>
+    </div>
+  </div></div>
+</div>
+
+<!-- ══ PRODUCT DETAIL ══ -->
+<div class="page" id="page-detail">
+  <div class="sec"><div class="wrap">
+    <button class="back-btn" id="detailBack"><svg viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"/></svg>Back</button>
+    <div class="detail-g rv" id="detailContent"></div>
+  </div></div>
+</div>
+
+<!-- ══ CATEGORIES ══ -->
+<div class="page" id="page-categories">
+  <div class="sec" style="padding-top:40px"><div class="wrap">
+    <div class="sec-row rv"><div><div class="sec-lbl">Everything We Carry</div><div class="ph-ttl">All <span>Categories</span></div></div></div>
+    <div class="full-cgrid stg rv" style="margin-top:32px" id="catGrid"></div>
+  </div></div>
+</div>
+
+<!-- ══ FAVOURITES ══ -->
+<div class="page" id="page-favourites">
+  <div class="sec"><div class="wrap">
+    <div class="sec-row rv"><div><div class="sec-lbl">Saved Items</div><div class="ph-ttl">Your <span>Favourites</span></div></div></div>
+    <div class="pgrid stg rv" id="favGrid"></div>
+    <div class="fav-empty" id="favEmpty" style="display:none">
+      <svg viewBox="0 0 24 24"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
+      <p>No favourites yet. Heart a product to save it here.</p>
+      <button class="btn-y" onclick="go('peripherals')">Browse Products →</button>
+    </div>
+  </div></div>
+</div>
+
+<!-- ══ ABOUT ══ -->
+<div class="page" id="page-about">
+  <div class="sec" style="padding-top:44px"><div class="wrap">
+    <div class="about-g">
+      <div class="about-img rv"><img src="https://www.dadducharger.com/cdn/shop/files/1.png?v=1759181378&width=700" alt="Store" loading="lazy"><div class="about-badge"><span>Est. 2019</span><small>Royal Plaza · Rawalpindi</small></div></div>
+      <div class="about-body rv" style="transition-delay:.12s">
+        <div class="sec-lbl">Who We Are</div>
+        <h2 class="sec-h" style="margin-bottom:16px">About <span>Daddu Charger</span></h2>
+        <p>Daddu Charger Gaming Store is <strong>Pakistan's premier destination</strong> for custom gaming PCs and peripherals, based at Royal Plaza, 6th Road, Satellite Town, Rawalpindi.</p>
+        <p>Founded in 2019, we grew from a small tech accessories shop into a full-scale gaming store with <strong>340,000+ social media followers</strong> and thousands of satisfied customers nationwide.</p>
+        <p>We specialise in <strong>custom gaming PC builds</strong> — from budget 245K setups to 1.4M+ flagship workstations. Every build is assembled in-house and rigorously tested before dispatch.</p>
+        <div class="astats stg">
+          <div class="astat"><div class="astat-n">340K+</div><div class="astat-l">Followers</div></div>
+          <div class="astat"><div class="astat-n">5+</div><div class="astat-l">Years</div></div>
+          <div class="astat"><div class="astat-n">1000+</div><div class="astat-l">Builds</div></div>
+        </div>
+        <div style="display:flex;gap:10px;flex-wrap:wrap"><button class="btn-y" onclick="go('contact')">Contact Us →</button><a href="https://wa.me/923115226682" target="_blank" class="btn-out">WhatsApp Us</a></div>
+      </div>
+    </div>
+    <div class="why-g stg rv" style="margin-top:60px">
+      <div class="why"><div class="why-em">⚡</div><div class="why-t">Expert Builders</div><div class="why-d">Every PC assembled by experienced technicians and stress-tested before leaving our store.</div></div>
+      <div class="why"><div class="why-em">🛡️</div><div class="why-t">Genuine Products</div><div class="why-d">100% authentic hardware — no grey market, no fakes. Official warranty where available.</div></div>
+      <div class="why"><div class="why-em">🚚</div><div class="why-t">Nationwide Delivery</div><div class="why-d">Secure packaged delivery anywhere in Pakistan. 50% advance to confirm.</div></div>
+    </div>
+  </div></div>
+</div>
+
+<!-- ══ CONTACT ══ -->
+<div class="page" id="page-contact">
+  <div class="sec" style="padding-top:44px"><div class="wrap">
+    <div class="sec-row rv" style="margin-bottom:32px"><div><div class="sec-lbl">Get In Touch</div><h2 class="sec-h">Contact <span>Us</span></h2></div></div>
+    <div class="contact-g">
+      <div class="rv">
+        <div class="citem"><div class="ci-ico"><svg viewBox="0 0 24 24"><path d="M17.657 16.657L13.414 20.9a2 2 0 0 1-2.827 0l-4.244-4.243a8 8 0 1 1 11.314 0z"/><path d="M15 11a3 3 0 1 1-6 0 3 3 0 0 1 6 0z"/></svg></div><div><div class="ci-lbl">Address</div><div class="ci-val">Royal Plaza, LG 04, 6th Road, Satellite Town, Rawalpindi</div></div></div>
+        <div class="citem"><div class="ci-ico"><svg viewBox="0 0 24 24"><path d="M3 5a2 2 0 0 1 2-2h3.28a1 1 0 0 1 .948.684l1.498 4.493a1 1 0 0 1-.502 1.21l-2.257 1.13a11.042 11.042 0 0 0 5.516 5.516l1.13-2.257a1 1 0 0 1 1.21-.502l4.493 1.498a1 1 0 0 1 .684.949V19a2 2 0 0 1-2 2h-1C9.716 21 3 14.284 3 6V5z"/></svg></div><div><div class="ci-lbl">WhatsApp / Call</div><div class="ci-val"><a href="tel:+923115226682">0311-5226682</a></div></div></div>
+        <div class="citem"><div class="ci-ico"><svg viewBox="0 0 24 24"><path d="M3 8l7.89 5.26a2 2 0 0 0 2.22 0L21 8M5 19h14a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2H5a2 2 0 0 0-2 2v10a2 2 0 0 0 2 2z"/></svg></div><div><div class="ci-lbl">Email</div><div class="ci-val"><a href="mailto:dadduchargergs@gmail.com">dadduchargergs@gmail.com</a></div></div></div>
+        <div class="citem" style="flex-direction:column;gap:9px"><div class="ci-lbl">Social Media</div><div class="soc-row">
+          <a href="https://facebook.com/dadducharger" target="_blank" class="soc"><svg viewBox="0 0 24 24"><path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z"/></svg></a>
+          <a href="https://instagram.com/dadducharg3r" target="_blank" class="soc"><svg viewBox="0 0 24 24" style="fill:none;stroke:currentColor;stroke-width:2"><rect x="2" y="2" width="20" height="20" rx="5"/><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"/></svg></a>
+          <a href="https://tiktok.com/@dadducharger" target="_blank" class="soc"><svg viewBox="0 0 24 24"><path d="M19.59 6.69a4.83 4.83 0 0 1-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 0 1-5.77 0 2.89 2.89 0 0 1 2.89-2.89c.28 0 .54.04.79.1V9.01a6.34 6.34 0 0 0-6.13 6.29 6.34 6.34 0 0 0 12.67 0V8.69a8.18 8.18 0 0 0 4.78 1.52V6.73a4.85 4.85 0 0 1-1.01-.04z"/></svg></a>
+          <a href="https://youtube.com/@dadducharger" target="_blank" class="soc"><svg viewBox="0 0 24 24"><path d="M22.54 6.42a2.78 2.78 0 0 0-1.95-1.96C18.88 4 12 4 12 4s-6.88 0-8.59.46a2.78 2.78 0 0 0-1.95 1.96A29 29 0 0 0 1 12a29 29 0 0 0 .46 5.58A2.78 2.78 0 0 0 3.41 19.6C5.12 20 12 20 12 20s6.88 0 8.59-.4a2.78 2.78 0 0 0 1.95-1.95A29 29 0 0 0 23 12a29 29 0 0 0-.46-5.58z"/><polygon points="9.75 15.02 15.5 12 9.75 8.98 9.75 15.02" style="fill:#050505"/></svg></a>
+        </div></div>
+        <div class="map-box"><iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3321.5!2d73.0479!3d33.6077!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x38dfed5d7aeac1eb%3A0x68a1a35d99ee7b48!2sDaddu%20Charger%20Gaming%20Store!5e0!3m2!1sen!2spk!4v1" allowfullscreen loading="lazy" title="Store"></iframe><div class="map-ft"><span class="map-dot"></span><span class="map-addr">Royal Plaza · 6th Road · Satellite Town · Rawalpindi</span></div></div>
+      </div>
+      <div class="c-form rv" style="transition-delay:.12s">
+        <div class="c-form-ttl">Send a <span>Message</span></div>
+        <div class="frow"><div class="fg"><label class="fl">First Name</label><input class="fi" type="text" placeholder="Ahmed"></div><div class="fg"><label class="fl">Last Name</label><input class="fi" type="text" placeholder="Khan"></div></div>
+        <div class="fg"><label class="fl">Email</label><input class="fi" type="email" placeholder="you@email.com"></div>
+        <div class="fg"><label class="fl">Phone</label><input class="fi" type="tel" placeholder="0311-XXXXXXX"></div>
+        <div class="fg"><label class="fl">Interested In</label><select class="fi fsel"><option>Select…</option><option>Custom PC Build</option><option>Graphics Card</option><option>Gaming Monitor</option><option>Keyboard / Mouse</option><option>Gaming Chair</option><option>Headphones</option><option>Other</option></select></div>
+        <div class="fg"><label class="fl">Message</label><textarea class="fta" placeholder="Tell us your requirements…"></textarea></div>
+        <button class="fsub" onclick="contactSend(this)">Send Message</button>
+        <p style="font-size:10px;color:var(--muted);text-align:center;margin-top:7px">We respond within 1–2 hours via WhatsApp</p>
+      </div>
+    </div>
+  </div></div>
+</div>
+
+<!-- ══ FOOTER ══ -->
+<footer>
+  <div class="wrap">
+    <div class="foot-g">
+      <div>
+        <div class="foot-logo"><div class="logo-wordmark" style="font-size:21px">Daddu<em>Charger</em></div></div>
+        <p class="foot-desc">Pakistan's premier destination for custom gaming PCs, peripherals &amp; gear. Royal Plaza, 6th Road, Satellite Town, Rawalpindi.</p>
+        <div class="soc-row">
+          <a href="https://facebook.com/dadducharger" target="_blank" class="soc"><svg viewBox="0 0 24 24"><path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z"/></svg></a>
+          <a href="https://instagram.com/dadducharg3r" target="_blank" class="soc"><svg viewBox="0 0 24 24" style="fill:none;stroke:currentColor;stroke-width:2"><rect x="2" y="2" width="20" height="20" rx="5"/><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"/></svg></a>
+          <a href="https://tiktok.com/@dadducharger" target="_blank" class="soc"><svg viewBox="0 0 24 24"><path d="M19.59 6.69a4.83 4.83 0 0 1-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 0 1-5.77 0 2.89 2.89 0 0 1 2.89-2.89c.28 0 .54.04.79.1V9.01a6.34 6.34 0 0 0-6.13 6.29 6.34 6.34 0 0 0 12.67 0V8.69a8.18 8.18 0 0 0 4.78 1.52V6.73a4.85 4.85 0 0 1-1.01-.04z"/></svg></a>
+          <a href="https://youtube.com/@dadducharger" target="_blank" class="soc"><svg viewBox="0 0 24 24"><path d="M22.54 6.42a2.78 2.78 0 0 0-1.95-1.96C18.88 4 12 4 12 4s-6.88 0-8.59.46a2.78 2.78 0 0 0-1.95 1.96A29 29 0 0 0 1 12a29 29 0 0 0 .46 5.58A2.78 2.78 0 0 0 3.41 19.6C5.12 20 12 20 12 20s6.88 0 8.59-.4a2.78 2.78 0 0 0 1.95-1.95A29 29 0 0 0 23 12a29 29 0 0 0-.46-5.58z"/><polygon points="9.75 15.02 15.5 12 9.75 8.98 9.75 15.02" style="fill:#050505"/></svg></a>
+        </div>
+      </div>
+      <div><div class="fc-ttl">Navigation</div><ul class="fl-list"><li><a href="#" onclick="go('home');return false">Home</a></li><li><a href="#" onclick="go('builds');return false">PC Builds</a></li><li><a href="#" onclick="go('peripherals');return false">Peripherals</a></li><li><a href="#" onclick="go('categories');return false">Categories</a></li><li><a href="#" onclick="go('about');return false">About</a></li><li><a href="#" onclick="go('contact');return false">Contact</a></li></ul></div>
+      <div><div class="fc-ttl">Policies</div><ul class="fl-list"><li><a href="https://www.dadducharger.com/policies/privacy-policy" target="_blank">Privacy Policy</a></li><li><a href="https://www.dadducharger.com/policies/refund-policy" target="_blank">Refund Policy</a></li><li><a href="https://www.dadducharger.com/policies/shipping-policy" target="_blank">Shipping Policy</a></li><li><a href="https://www.dadducharger.com/policies/terms-of-service" target="_blank">Terms of Service</a></li></ul></div>
+      <div><div class="fc-ttl">Contact</div><ul class="fl-list"><li><a href="tel:+923115226682">0311-5226682</a></li><li><a href="mailto:dadduchargergs@gmail.com">dadduchargergs@gmail.com</a></li><li><a href="https://wa.me/923115226682" target="_blank">WhatsApp Us</a></li></ul><div style="margin-top:18px"><div class="fc-ttl">Payment</div><div class="ppills"><span class="ppill">JazzCash</span><span class="ppill">EasyPaisa</span><span class="ppill">Bank Transfer</span><span class="ppill">COD</span></div></div></div>
+    </div>
+    <div class="foot-bt"><div class="foot-copy">© 2025 <span>Daddu Charger Gaming Store</span> · All Rights Reserved · Rawalpindi, Pakistan</div><div style="font-size:10px;color:var(--muted)">50% Advance · Delivery All Over Pakistan</div></div>
+  </div>
+</footer>
+
+<a href="https://wa.me/923115226682" target="_blank" class="float-wa"><svg viewBox="0 0 24 24"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 0 1-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 0 1-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 0 1 2.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0 0 12.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 0 0 5.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 0 0-3.48-8.413Z"/></svg></a>
+
+<script>
+/* ════════════════════════════════════════
+   PRODUCT DATABASE
+════════════════════════════════════════ */
+const DB = [
+  /* ── KEYBOARDS ── */
+  {sku:'KB-AULA-WIN60',nm:'AULA WIN60 HE 60% Magnetic Switch Keyboard',cat:'keyboards',pr:8500,op:15500,img:'https://www.dadducharger.com/cdn/shop/files/BP132951.webp?v=1759980353&width=600',imgs:['https://www.dadducharger.com/cdn/shop/files/BP132951.webp?v=1759980353&width=600','https://www.dadducharger.com/cdn/shop/files/1-24121315452C16.jpg?v=1759980353&width=600'],feat:true,
+  desc:`The AULA WIN60 HE is engineered for competitive gamers who demand the absolute pinnacle of responsiveness. Hall Effect magnetic switches use magnets instead of physical contacts, meaning there is zero debounce delay and the actuation point is fully adjustable between 0.1mm and 4.0mm. At 8,000Hz polling rate — eight times faster than standard keyboards — every keypress is transmitted to your PC in under 0.125ms.\n\nThe hot-swappable PCB lets you swap switches in seconds without soldering, and the aircraft-grade aluminium top plate provides structural rigidity that eliminates keyboard flex. Full per-key RGB supports 19 preset lighting effects and custom programming via the AULA software suite.`,
+  specs:[['Switch','Hall Effect Magnetic (HE)'],['Layout','60% — 61 Keys'],['Polling Rate','8,000 Hz'],['Connectivity','USB-C Wired (Detachable)'],['Hot-Swap','Yes — 3-Pin MX Compatible'],['Actuation','Adjustable 0.1–4.0mm'],['Backlight','Full Per-Key RGB'],['Frame','Aluminium Top Plate']]},
+
+  {sku:'KB-HX-AE2',nm:'HyperX Alloy Elite 2 Mechanical Keyboard (Open Box)',cat:'keyboards',pr:11500,op:25000,img:'https://www.dadducharger.com/cdn/shop/files/hx-product-keyboard-alloy-elite-2-us-1-zm-lg.webp?v=1759972148&width=600',imgs:['https://www.dadducharger.com/cdn/shop/files/hx-product-keyboard-alloy-elite-2-us-1-zm-lg.webp?v=1759972148&width=600','https://www.dadducharger.com/cdn/shop/files/hx-product-keyboard-alloy-elite-2-us-3-zm-lg.webp?v=1759972148&width=600'],feat:false,
+  desc:`The HyperX Alloy Elite 2 is a full-size mechanical gaming keyboard built around HyperX's own Red linear switches — offering smooth, consistent keystrokes with a light 45g actuation force ideal for both rapid gaming inputs and extended typing. This is an open-box unit, tested and verified by our team to be in perfect working condition.\n\nThe solid steel frame guarantees lasting durability, and the dedicated multimedia controls with a large tactile volume wheel give you intuitive media management without alt-tabbing. A USB 2.0 pass-through port keeps your desk tidy, and RGB lighting is fully customisable through HyperX NGENUITY software.`,
+  specs:[['Switch','HyperX Red Linear'],['Actuation Force','45g'],['Layout','Full-Size 104 Keys'],['Frame','Solid Steel'],['Connectivity','USB-A Wired'],['USB Passthrough','Yes — USB 2.0'],['Media Controls','Dedicated Wheel + Keys'],['Condition','Open Box (Tested)']]},
+
+  {sku:'KB-AS-X65PRO',nm:'Attack Shark X65PRO HE Wireless Keyboard',cat:'keyboards',pr:20500,op:24500,img:'https://www.dadducharger.com/cdn/shop/files/2_3d1f7bdc-5cb2-487d-8de7-4b5be0d04daf.webp?v=1760017455&width=600',imgs:['https://www.dadducharger.com/cdn/shop/files/2_3d1f7bdc-5cb2-487d-8de7-4b5be0d04daf.webp?v=1760017455&width=600'],feat:true,
+  desc:`The Attack Shark X65PRO eliminates the compromise between wireless freedom and competitive performance. Hall Effect magnetic switches paired with Rapid Trigger technology re-arm the key the instant it travels above your custom reset point — critical for strafing and counter-strafing in CS2 and Valorant where millisecond differences determine outcomes.\n\nTri-mode connectivity (2.4GHz USB dongle, Bluetooth 5.0, and wired USB-C) lets you connect to any device. The 4,000mAh battery delivers up to 35 hours of wireless play on 2.4GHz. The compact 65% layout keeps your mouse hand closer to the keyboard centre for better ergonomics without sacrificing arrow keys.`,
+  specs:[['Switch','Hall Effect Magnetic'],['Layout','65% — 68 Keys'],['Connectivity','2.4GHz / Bluetooth 5.0 / USB-C'],['Rapid Trigger','Yes — Adjustable Reset Point'],['Polling Rate','1000Hz Wireless'],['Battery','4000mAh — Up to 35 hrs'],['Backlighting','Full RGB'],['Weight','680g']]},
+
+  {sku:'KB-EPOMAKER-75X',nm:'EPOMAKER Dynatab 75X RGB Dot-Matrix Display',cat:'keyboards',pr:28000,op:64000,img:'https://www.dadducharger.com/cdn/shop/files/616-Sz_bpqL.jpg?v=1765372737&width=600',imgs:['https://www.dadducharger.com/cdn/shop/files/616-Sz_bpqL.jpg?v=1765372737&width=600'],feat:true,
+  desc:`The EPOMAKER Dynatab 75X is the most visually distinctive keyboard in our collection. Its on-board RGB dot-matrix display can cycle through animations, show system stats like CPU/GPU temperature, or display custom artwork — all configurable via EPOMAKER's driver software.\n\nFlamingo tactile switches deliver a satisfying bump at 67g actuation force without being overly loud. The gasket-mounted PCB absorbs vibrations, giving typing a cushioned, premium feel that top-mount and tray-mount designs cannot match. QMK/VIA firmware support allows unlimited keymap customisation for advanced users.`,
+  specs:[['Switch','Flamingo Tactile — 67g'],['Layout','75% Compact'],['Special Feature','On-Board RGB Dot-Matrix Display'],['PCB Mount','Gasket Mount'],['Keycaps','PBT Double-Shot'],['Firmware','QMK / VIA'],['Connectivity','USB-C Wired'],['Programmability','Full — All Keys Remappable']]},
+
+  {sku:'KB-R8-1037',nm:'R8 1037 RGB Mechanical 60% Keyboard',cat:'keyboards',pr:4500,op:6500,img:'https://www.dadducharger.com/cdn/shop/files/H27373c61d9b44a3bb754457cdf9a07fcH.jpg?v=1759979991&width=600',imgs:['https://www.dadducharger.com/cdn/shop/files/H27373c61d9b44a3bb754457cdf9a07fcH.jpg?v=1759979991&width=600'],feat:false,
+  desc:`An excellent entry point into the mechanical keyboard hobby, the R8 1037 offers hot-swappable sockets at a price that does not require a second thought. You can experiment with different switch types — clicky, tactile, or linear — simply by pulling and inserting, no soldering required.\n\nThe compact 60% form factor frees up desk space and positions your mouse hand optimally. Triple-layer RGB lighting cycles through 19 effects and can be controlled on-the-fly with Fn key shortcuts. The ABS construction keeps the unit lightweight and portable.`,
+  specs:[['Layout','60% — 61 Keys'],['Hot-Swap','Yes — 3-Pin MX'],['Backlighting','RGB — 19 Preset Effects'],['Connectivity','USB-C Wired'],['Body','ABS Plastic'],['Switch Compatibility','MX-Style 3-Pin'],['Keycaps','ABS Double-Shot'],['Weight','520g']]},
+
+  /* ── MICE ── */
+  {sku:'MS-AS-X3MAX',nm:'Attack Shark X3Max Wireless Gaming Mouse',cat:'mice',pr:10000,op:null,img:'https://www.dadducharger.com/cdn/shop/files/attack-shark-x3max-black-mouse-price-in-pakistan-junaidtech--19643-2370049-170525050324888.jpg?v=1771077870&width=600',imgs:['https://www.dadducharger.com/cdn/shop/files/attack-shark-x3max-black-mouse-price-in-pakistan-junaidtech--19643-2370049-170525050324888.jpg?v=1771077870&width=600'],feat:true,
+  desc:`The Attack Shark X3Max represents the state of the art in wireless gaming mice. The PixArt PAW3950 sensor tracks at up to 42,000 DPI with zero spin-out at any movement speed, and its LOD (lift-off distance) can be configured down to 0.7mm for precise control right off the mousepad.\n\nAt 49g, the X3Max competes with the lightest gaming mice on the market without sacrificing build rigidity. Tri-mode connectivity means 2.4GHz for competitive play (sub-1ms), Bluetooth 5.2 for office use, and USB-C wired when charging. The 95-hour wireless battery life on 2.4GHz is class-leading. Grip tape is included for personalisation.`,
+  specs:[['Sensor','PixArt PAW3950'],['Max DPI','42,000'],['Min DPI','200'],['Weight','49g'],['Connectivity','2.4GHz + BT 5.2 + USB-C'],['Battery','Up to 95 hours (2.4GHz)'],['Polling Rate','Up to 4000Hz'],['Switches','Huano Blue Shell']]},
+
+  {sku:'MS-AS-X1-BLK',nm:'Attack Shark X1 Wireless Gaming Mouse — Black',cat:'mice',pr:12500,op:null,img:'https://www.dadducharger.com/cdn/shop/files/attack-shark-x1-mouse-price-in-pakistan-junaidtech-black-wir-19643-2370048-170525045948159.jpg?v=1771077467&width=600',imgs:['https://www.dadducharger.com/cdn/shop/files/attack-shark-x1-mouse-price-in-pakistan-junaidtech-black-wir-19643-2370048-170525045948159.jpg?v=1771077467&width=600'],feat:false,
+  desc:`The Attack Shark X1 Black pairs the PixArt PAW3395 PRO sensor — used in multiple world championship winning setups — with a premium RGB charging dock that keeps the mouse always ready and displayed beautifully on your desk.\n\nThe right-handed ergonomic shell positions your thumb, ring, and pinky fingers naturally, reducing ulnar deviation during extended sessions. At 53g it handles both palm and claw grip styles with ease. Included grip tape rolls allow complete customisation of tactile feel. The RGB dock charges via USB-C and glows with synchronised lighting.`,
+  specs:[['Sensor','PixArt PAW3395 PRO'],['Max DPI','40,000'],['Weight','53g'],['Grip Style','Right-Handed Ergonomic'],['Connectivity','Tri-Mode + RGB Dock'],['Battery','Up to 80 hours'],['Polling Rate','1000Hz Wireless'],['Extras','Grip Tape + RGB Charging Dock']]},
+
+  {sku:'MS-GLO-O-W',nm:'Glorious Model O Wireless — Matte White',cat:'mice',pr:8000,op:9500,img:'https://www.dadducharger.com/cdn/shop/files/Glorious-Model-O-Minus-Wireless-RGB-Mouse-Matte-White-Price-in-Pakistan.webp?v=1761057440&width=600',imgs:['https://www.dadducharger.com/cdn/shop/files/Glorious-Model-O-Minus-Wireless-RGB-Mouse-Matte-White-Price-in-Pakistan.webp?v=1761057440&width=600'],feat:true,
+  desc:`The Glorious Model O is an icon of the lightweight gaming mouse movement. Its honeycomb perforated shell shaves weight to just 67g while maintaining full structural integrity — you can flex the sides slightly but the shell never creaks or rattles during rapid flicking.\n\nThe BAMF sensor tracks accurately to 19,000 DPI and handles any mouse surface without needing calibration. Glorious Flex 2.4GHz wireless delivers sub-1ms response times indistinguishable from wired. The ambidextrous symmetrical shape accommodates both left and right-handed grip styles equally. Matte White resists fingerprints and surface grime.`,
+  specs:[['Sensor','PixArt PAW3370 BAMF'],['Max DPI','19,000'],['Weight','67g'],['Shell','Honeycomb Perforated'],['Connectivity','2.4GHz Wireless'],['Design','Ambidextrous Symmetrical'],['Finish','Matte White (Fingerprint Resistant)'],['Buttons','6 Programmable']]},
+
+  {sku:'MS-BOOST-RAP',nm:'Boost Raptor RGB Wireless Gaming Mouse',cat:'mice',pr:4000,op:5000,img:'https://www.dadducharger.com/cdn/shop/files/boost-raptor-rgb-wireless-gaming-mouse-price-in-pakistan-3-19643-1975174-050224055305155.webp?v=1770207091&width=600',imgs:['https://www.dadducharger.com/cdn/shop/files/boost-raptor-rgb-wireless-gaming-mouse-price-in-pakistan-3-19643-1975174-050224055305155.webp?v=1770207091&width=600'],feat:false,
+  desc:`The Boost Raptor offers genuine wireless gaming freedom at an exceptional price point. Four selectable DPI levels let you switch between precision sniping and fast navigation instantly using the DPI button behind the scroll wheel.\n\nThe ergonomic right-handed shell with textured side grips prevents slippage during intense gameplay. A single AA battery delivers an impressive 18-month standby time — you won't need charging cables on your desk. RGB lighting on the scroll wheel and body adds a vibrant touch to any setup without requiring drivers.`,
+  specs:[['Connectivity','2.4GHz Wireless'],['DPI Levels','800 / 1200 / 2400 / 3200'],['Battery','1× AA — Up to 18 months'],['Buttons','6 Programmable'],['Backlight','RGB Scroll + Body'],['Design','Right-Handed Ergonomic'],['Report Rate','125Hz'],['Weight','90g (with battery)']]},
+
+  /* ── CHAIRS ── */
+  {sku:'CH-MXG-GCH01',nm:'MXG Diamond Quilted PU Gaming Chair — Red/Black',cat:'chairs',pr:22000,op:28000,img:'https://www.dadducharger.com/cdn/shop/files/MXG-GCH-01-Large-Diamound-Quilted-PU-with-Headrest-and-Lumbar-Support-Gaming-Chair-Red-Black-Price-in-Pakistan-450x450-1.jpg?v=1761218774&width=600',imgs:['https://www.dadducharger.com/cdn/shop/files/MXG-GCH-01-Large-Diamound-Quilted-PU-with-Headrest-and-Lumbar-Support-Gaming-Chair-Red-Black-Price-in-Pakistan-450x450-1.jpg?v=1761218774&width=600'],feat:true,
+  desc:`The MXG GCH-01 elevates the standard gaming chair aesthetic with diamond-quilted PU leather upholstery that rivals office executive chairs in visual quality. The large bucket seat and high backrest accommodate users up to 120kg, and the pronounced side bolsters keep you centred during intense gaming.\n\nA detachable lumbar cushion and an adjustable headrest pillow can be positioned precisely for your spinal curvature. 4D armrests adjust in height, width, depth, and rotation — allowing precise alignment with your desk. The full 160° recline lets you shift from gaming posture to a near-horizontal relaxation position.`,
+  specs:[['Upholstery','Diamond Quilted PU Leather'],['Max Load','120 kg'],['Recline Range','90° – 160°'],['Armrests','4D Fully Adjustable'],['Lumbar Support','Detachable Memory Foam Cushion'],['Headrest','Adjustable Pillow'],['Base','5-Star Heavy-Duty Steel'],['Casters','PU — Floor Friendly']]},
+
+  {sku:'CH-ERGO-PRO',nm:'Ergonomic Racing Pro Gaming Chair',cat:'chairs',pr:18500,op:24000,img:'https://www.dadducharger.com/cdn/shop/files/MXG-GCH-01-Large-Diamound-Quilted-PU-with-Headrest-and-Lumbar-Support-Gaming-Chair-Red-Black-Price-in-Pakistan-450x450-1.jpg?v=1761218774&width=600',imgs:['https://www.dadducharger.com/cdn/shop/files/MXG-GCH-01-Large-Diamound-Quilted-PU-with-Headrest-and-Lumbar-Support-Gaming-Chair-Red-Black-Price-in-Pakistan-450x450-1.jpg?v=1761218774&width=600'],feat:false,
+  desc:`Inspired by motorsport bucket seats, the Ergonomic Racing Pro wraps you in high-bolstered shell that maintains your posture during marathon sessions. High-density cold-cure foam padding holds its shape under daily heavy use — no sagging or bottoming out even after years.\n\nMesh ventilation panels on the backrest sides provide passive airflow to prevent heat build-up, keeping you comfortable during summer gaming. The Class 4 certified gas cylinder delivers smooth height adjustment from 43cm to 53cm seat height. PU-coated casters protect both hardwood and carpet surfaces.`,
+  specs:[['Foam','High-Density Cold-Cure'],['Seat Height','43 – 53 cm Adjustable'],['Recline','90° – 155°'],['Armrests','3D Adjustable'],['Casters','PU Coated — Floor Safe'],['Gas Lift','Class 4 Certified'],['Ventilation','Side Mesh Panels'],['Weight Capacity','130 kg']]},
+
+  /* ── HEADPHONES ── */
+  {sku:'HP-DC-G1',nm:'Daddu Charger G1 Premium Gaming Headset',cat:'headphones',pr:6500,op:9000,img:'https://www.dadducharger.com/cdn/shop/files/IMG_6790.jpg?v=1761218682&width=600',imgs:['https://www.dadducharger.com/cdn/shop/files/IMG_6790.jpg?v=1761218682&width=600'],feat:true,
+  desc:`The Daddu Charger G1 is our flagship in-house curated gaming headset delivering powerful, well-balanced audio at a price that won't compromise your build budget. Fifty-millimetre neodymium magnet drivers produce a wide soundstage with thumping bass and crisp high-frequency detail — you'll hear every footstep, reload clink, and ambient audio cue.\n\nThe retractable unidirectional microphone with flexible gooseneck positions precisely where you need it and cancels background noise for clear in-game communication. Memory foam cushions wrapped in breathable faux-leather form a comfortable acoustic seal without causing ear fatigue. Compatible with PC, PS5, Xbox, and mobile via the 3.5mm connector.`,
+  specs:[['Driver','50mm Neodymium Magnet'],['Frequency Response','20Hz – 20,000Hz'],['Impedance','32Ω'],['Microphone','Retractable Unidirectional — Noise Cancelling'],['Connection','3.5mm + USB Adapter Included'],['Ear Cushions','Memory Foam + Breathable Faux-Leather'],['Compatibility','PC / PS5 / Xbox / Mobile'],['Cable Length','1.8m Braided']]},
+
+  {sku:'HP-DC-W1',nm:'Daddu Charger W1 Wireless Gaming Headset',cat:'headphones',pr:9500,op:13000,img:'https://www.dadducharger.com/cdn/shop/files/IMG_6790.jpg?v=1761218682&width=600',imgs:['https://www.dadducharger.com/cdn/shop/files/IMG_6790.jpg?v=1761218682&width=600'],feat:false,
+  desc:`Experience cord-free audio freedom with the Daddu Charger W1. Its 2.4GHz USB dongle connection maintains under 20ms audio latency — imperceptible during gameplay — while Bluetooth 5.0 provides a secondary wireless channel for your phone. Switch between audio sources with a single dedicated button.\n\nAt 40 continuous hours of wireless battery life, a daily gamer can go an entire week without charging. The detachable boom microphone can be removed entirely when you switch to music or streaming, presenting a cleaner look. USB-C fast charging tops up the battery in under 2 hours.`,
+  specs:[['Connectivity','2.4GHz USB Dongle + Bluetooth 5.0'],['Latency','<20ms (2.4GHz Mode)'],['Battery Life','40 Hours Wireless'],['Microphone','Detachable Boom Mic'],['Driver','40mm Neodymium'],['Charging','USB-C — 0 to 100% in under 2 hours'],['Ear Cups','Memory Foam — Plush Velour Cover'],['Weight','298g']]},
+
+  /* ── MONITORS ── */
+  {sku:'MN-27-QHD165',nm:'Gaming Monitor 27" QHD 165Hz IPS',cat:'monitors',pr:42000,op:52000,img:'https://www.dadducharger.com/cdn/shop/files/Q27G4_62d380ab-8e2c-4cc2-b6b0-2e45deefc105.webp?v=1749030782&width=600',imgs:['https://www.dadducharger.com/cdn/shop/files/Q27G4_62d380ab-8e2c-4cc2-b6b0-2e45deefc105.webp?v=1749030782&width=600'],feat:false,
+  desc:`This 27-inch QHD IPS gaming monitor delivers a pixel density of 108 PPI — a 78% improvement over 1080p on the same screen size. Text appears sharper, game environments are more detailed, and UI elements scale cleanly. The IPS panel ensures colour accuracy and wide viewing angles without the colour wash that VA and TN panels exhibit off-axis.\n\n165Hz refresh rate with 1ms MPRT eliminates ghosting in fast-paced titles, and AMD FreeSync Premium synchronises the display to your GPU's frame output for completely tear-free rendering. The ergonomic stand supports height adjustment, tilt, and 90° pivot into portrait mode.`,
+  specs:[['Panel Type','IPS'],['Resolution','2560 × 1440 QHD'],['Refresh Rate','165Hz'],['Response Time','1ms MPRT'],['Sync Technology','AMD FreeSync Premium'],['Ports','2× HDMI 2.0 + 1× DisplayPort 1.4'],['Stand','Height / Tilt / Pivot / Swivel'],['HDR','DisplayHDR 400']]},
+
+  /* ── CONTROLLERS ── */
+  {sku:'CT-PROX-01',nm:'Pro Gaming Controller — PS5 / Xbox / PC Compatible',cat:'controllers',pr:4500,op:null,img:'https://www.dadducharger.com/cdn/shop/files/Untitled_design_f369d9ac-53df-4215-91ab-373c39c1587f.png?v=1761354207&width=600',imgs:['https://www.dadducharger.com/cdn/shop/files/Untitled_design_f369d9ac-53df-4215-91ab-373c39c1587f.png?v=1761354207&width=600'],feat:false,
+  desc:`A universal pro-grade controller with true cross-platform versatility. Xinput and DirectInput modes ensure compatibility with virtually every PC title without drivers, while native support for PS5 and Xbox Series consoles via USB-C makes it a single controller for your entire setup.\n\nDual rumble motors with adjustable intensity deliver nuanced haptic feedback. The adjustable trigger resistance lets you configure L2/R2 for racing games (soft, full travel) or shooters (stiff, short throw). Textured grip zones on handles and triggers prevent slippage. The 3.5mm audio jack allows game audio monitoring directly from the controller.`,
+  specs:[['Platform Compatibility','PS5 / Xbox Series / PC / Android'],['Connectivity','USB-C Wired + 2.4GHz Wireless'],['Rumble','Dual Motor Haptics — Adjustable'],['Trigger Resistance','Software-Adjustable L2/R2'],['Audio','3.5mm Headphone Jack'],['Driver','Plug &amp; Play — No Install'],['Mode Switch','Xinput / DirectInput'],['Battery','1500mAh — 20 Hours Wireless']]}
+];
+
+/* BUILDS */
+const BUILDS=[
+  {id:'b1',tier:'budget',nm:'⚡ Core i5-12400F + RTX 3060 Ti | 1080p / 2K Beast',img:'https://www.dadducharger.com/cdn/shop/files/Untitleddesign_23.png?v=1761750094&width=600',badge:'BUDGET',bc:'background:var(--y);color:#111',pr:245000,
+   specs:[['CPU','i5-12400F'],['GPU','RTX 3060 Ti 8GB'],['RAM','16GB DDR4 3200MHz'],['Storage','512GB NVMe SSD'],['Target','1080p / 2K Gaming'],['PSU','550W 80+ Bronze']]},
+  {id:'b2',tier:'budget',nm:'⚡ Ryzen 5 7600 + RTX 3070 OC | Value 2K Build',img:'https://www.dadducharger.com/cdn/shop/files/Gaming_Chairs_in_Rawalpindi_Best_Prices_in_Pakistan_Daddu_Charger_Gaming_Store_Upgrade_your_gaming_experience_with_premium_gaming_chairs_in_Rawalpindi_designed_for_comfort_durability.png?v=1761602768&width=600',badge:'VALUE',bc:'background:#22c55e;color:#fff',pr:265000,op:315000,
+   specs:[['CPU','Ryzen 5 7600'],['GPU','RTX 3070 OC (Used)'],['RAM','16GB DDR5 4800MHz'],['Storage','1TB NVMe SSD'],['Target','1080p / 2K'],['PSU','650W 80+ Gold']]},
+  {id:'b3',tier:'mid',nm:'⚡ Ryzen 7 7800X3D + MSI RTX 5070 | 2K / 4K',img:'https://www.dadducharger.com/cdn/shop/files/GamingChairsinRawalpindi_BestPricesinPakistanDadduChargerGamingStoreUpgradeyourgamingexperiencewithpremiumgamingchairsinRawalpindi_designedforcomfort_durability_and_2.png?v=1761603326&width=600',badge:'MID-RANGE',bc:'background:#3b82f6;color:#fff',pr:499000,
+   specs:[['CPU','R7 7800X3D'],['GPU','RTX 5070 12GB'],['RAM','32GB DDR5 6000MHz'],['Storage','1TB Gen4 NVMe'],['Target','2K / 4K Gaming'],['PSU','750W 80+ Gold']]},
+  {id:'b4',tier:'mid',nm:'Premium White Build | R9 7900X + ROG RTX 3080',img:'https://www.dadducharger.com/cdn/shop/files/GamingChairsinRawalpindi_BestPricesinPakistanDadduChargerGamingStoreUpgradeyourgamingexperiencewithpremiumgamingchairsinRawalpindi_designedforcomfort_durability_and_4.png?v=1761604768&width=600',badge:'PREMIUM',bc:'background:#9333ea;color:#fff',pr:555000,
+   specs:[['CPU','R9 7900X'],['GPU','ROG RTX 3080 White'],['RAM','32GB DDR5 White RGB'],['Storage','2TB Gen4 NVMe'],['Theme','All-White Aesthetic'],['PSU','850W 80+ Platinum']]},
+  {id:'b5',tier:'high',nm:'⚡ R9 9800X3D + ASUS TUF RTX 5070 Ti | 4K Ultra',img:'https://www.dadducharger.com/cdn/shop/files/Untitled_design_21.png?v=1761749355&width=600',badge:'TOP BUILD',bc:'background:var(--y);color:#111',pr:895000,
+   specs:[['CPU','R9 9800X3D'],['GPU','RTX 5070 Ti 16GB'],['RAM','32GB DDR5 6400MHz'],['Storage','2TB Gen5 NVMe'],['Target','4K Ultra Gaming'],['PSU','1000W 80+ Titanium']]},
+  {id:'b6',tier:'high',nm:'RS 1050K | R9 9800X3D + ASUS TUF RTX 5080 OC',img:'https://www.dadducharger.com/cdn/shop/files/Gaming_Chairs_in_Rawalpindi_Best_Prices_in_Pakistan_Daddu_Charger_Gaming_Store_Upgrade_your_gaming_experience_with_premium_gaming_chairs_in_Rawalpindi_designed_for_comfort_durability_3f28e476-fa14-40aa-bf1f-6ccf327295e5.png?v=1761604385&width=600',badge:'BEAST',bc:'background:#e11d48;color:#fff',pr:1425000,op:1100000,
+   specs:[['CPU','R9 9800X3D'],['GPU','RTX 5080 OC 16GB'],['RAM','64GB DDR5 6400MHz'],['Storage','4TB Gen5 NVMe'],['Use Case','Gaming + Workstation'],['PSU','1200W 80+ Titanium']]}
+];
+
+/* CATEGORIES full data */
+const CATS=[
+  {nm:'Custom PC Builds',desc:'Hand-assembled gaming & workstation PCs from budget to flagship. All built in our Rawalpindi showroom.',img:'https://www.dadducharger.com/cdn/shop/files/Untitled_design_21.png?v=1761749355&width=600',tags:['Ryzen 9','RTX 5080','DDR5','4K Ready'],action:()=>go('builds')},
+  {nm:'New Graphics Cards',desc:'Latest NVIDIA RTX 50 series. Brand new with genuine warranty. Limited units in store.',img:'https://www.dadducharger.com/cdn/shop/files/ROG-Astral-GeForce-RTX_-5090-32GB-GDDR7-OC-Edition-Graphics-Card-04_96b447dd-cfc5-4406-a342-636af10286a6.jpg?v=1760192608&width=600',tags:['RTX 5090','RTX 5080','RTX 5070'],action:()=>{go('contact')}},
+  {nm:'Used Graphics Cards',desc:'Tested & verified pre-owned GPUs — perfect for budget builds with real performance.',img:'https://www.dadducharger.com/cdn/shop/files/h732-2.webp?v=1760200203&width=600',tags:['RTX 3080','RTX 3070','RTX 3060 Ti'],action:()=>{go('contact')}},
+  {nm:'Gaming Monitors',desc:'24" to 49" curved gaming monitors. 165Hz–360Hz, IPS & VA, with up to 15% off right now.',img:'https://www.dadducharger.com/cdn/shop/files/Q27G4_62d380ab-8e2c-4cc2-b6b0-2e45deefc105.webp?v=1749030782&width=600',tags:['165Hz','4K','1ms','Curved'],action:()=>{switchTab('monitors');go('peripherals')}},
+  {nm:'Motherboards',desc:'AMD AM5 & Intel LGA 1851 boards from ASUS ROG, MSI MEG, Gigabyte AORUS.',img:'https://www.dadducharger.com/cdn/shop/files/rog-crosshair-x870e-hero-2-550x550.jpg?v=1760298629&width=600',tags:['AM5','X870E','Z790'],action:()=>{go('contact')}},
+  {nm:'Gaming Keyboards',desc:'Mechanical & Hall Effect switch keyboards. 60% to full-size, wired & wireless.',img:'https://www.dadducharger.com/cdn/shop/files/cn-11134207-7r98o-lz4nb56wi8ab97_eb14bca5-31bb-4016-aeb7-317928a2c40b.jpg?v=1760048019&width=600',tags:['HE Switch','RGB','Rapid Trigger'],action:()=>{switchTab('keyboards');go('peripherals')}},
+  {nm:'Gaming Mice',desc:'Wired & wireless gaming mice. Ultra-light builds, high DPI sensors, ergonomic designs.',img:'https://www.dadducharger.com/cdn/shop/files/Untitled_design_3_9fa19b6a-8aaf-4d7c-809e-bc5c40a49e4d.png?v=1761354358&width=600',tags:['Wireless','42K DPI','PAW3950'],action:()=>{switchTab('mice');go('peripherals')}},
+  {nm:'Gaming Chairs',desc:'Ergonomic gaming chairs built for long sessions — lumbar support, 4D armrests, premium PU.',img:'https://www.dadducharger.com/cdn/shop/files/MXG-GCH-01-Large-Diamound-Quilted-PU-with-Headrest-and-Lumbar-Support-Gaming-Chair-Red-Black-Price-in-Pakistan-450x450-1.jpg?v=1761218774&width=600',tags:['4D Armrests','160° Recline','PU Leather'],action:()=>{switchTab('chairs');go('peripherals')}},
+  {nm:'Headphones',desc:'Gaming headsets & wireless headphones. Noise-cancelling mics, surround sound, long battery life.',img:'https://www.dadducharger.com/cdn/shop/files/IMG_6790.jpg?v=1761218682&width=600',tags:['Wireless','Noise-Cancel','Surround'],action:()=>{switchTab('headphones');go('peripherals')}},
+  {nm:'RAM',desc:'DDR4 & DDR5 memory kits from 16GB to 64GB. All speeds for gaming and workstation builds.',img:'https://www.dadducharger.com/cdn/shop/files/xpg-spectrix-d35g-rgb-16gb-2x8gb-3600mhz-c18-ddr4-dram-desktop-memory.jpg?v=1749045180&width=600',tags:['DDR5','DDR4','RGB'],action:()=>{go('contact')}},
+  {nm:'NVMe / SSDs',desc:'Gen4 & Gen5 NVMe SSDs from 500GB to 4TB. Up to 7,000MB/s read speeds.',img:'https://www.dadducharger.com/cdn/shop/files/nvmedd.png?v=1749045470&width=600',tags:['Gen5','Gen4','7000MB/s'],action:()=>{go('contact')}},
+  {nm:'Power Supply Units',desc:'80+ Gold, Platinum & Titanium PSUs from 650W to 1600W. Fully modular options.',img:'https://www.dadducharger.com/cdn/shop/files/w320px_h320px_1713340465.png?v=1749044326&width=600',tags:['80+ Gold','Modular','1600W'],action:()=>{go('contact')}}
+];
+
+/* ════════════════════════════════════════
+   STATE
+════════════════════════════════════════ */
+let cart=[], favs=new Set(), prevPage='home', curPeriTab='keyboards';
+
+/* ════════════════════════════════════════
+   CURSOR  — sharp diamond dot + trailing ring
+   Uses translate3d → always GPU composited
+════════════════════════════════════════ */
+(()=>{
+  const dot=document.getElementById('cur-dot');
+  const ring=document.getElementById('cur-ring');
+  let mx=window.innerWidth/2, my=window.innerHeight/2;
+  let rx=mx, ry=my;
+
+  document.addEventListener('mousemove',e=>{mx=e.clientX;my=e.clientY},{passive:true});
+
+  let raf;
+  const tick=()=>{
+    /* Dot snaps instantly */
+    dot.style.transform=`translate3d(${mx-5}px,${my-5}px,0)`;
+    /* Ring lerps for trailing effect */
+    rx+=(mx-rx)*0.13;
+    ry+=(my-ry)*0.13;
+    ring.style.transform=`translate3d(${rx-16}px,${ry-16}px,0)`;
+    raf=requestAnimationFrame(tick);
+  };
+  raf=requestAnimationFrame(tick);
+
+  /* Hover states */
+  document.addEventListener('mouseover',e=>{
+    if(e.target.closest('a,button,.pc,.hc,.cat,.bcard,.ccard,.vc,.bnr,.sr-item'))
+      document.body.classList.add('c-hover');
+  });
+  document.addEventListener('mouseout',e=>{
+    if(e.target.closest('a,button,.pc,.hc,.cat,.bcard,.ccard,.vc,.bnr,.sr-item'))
+      document.body.classList.remove('c-hover');
+  });
+  document.addEventListener('mousedown',()=>document.body.classList.add('c-click'));
+  document.addEventListener('mouseup',()=>document.body.classList.remove('c-click'));
+  document.addEventListener('mouseleave',()=>{dot.style.opacity='0';ring.style.opacity='0'});
+  document.addEventListener('mouseenter',()=>{dot.style.opacity='1';ring.style.opacity='1'});
+})();
+
+/* ════════════════════════════════════════
+   SCROLL REVEAL — IntersectionObserver
+════════════════════════════════════════ */
+const io=new IntersectionObserver(entries=>{
+  entries.forEach(e=>{if(e.isIntersecting){e.target.classList.add('vis');io.unobserve(e.target)}});
+},{threshold:0.06});
+function observeAll(){document.querySelectorAll('.rv:not(.vis),.stg:not(.vis)').forEach(el=>io.observe(el))}
+observeAll();
+
+/* ════════════════════════════════════════
+   NAVIGATION
+════════════════════════════════════════ */
+function go(id){
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('on'));
+  document.querySelectorAll('.nb,.dnb').forEach(b=>b.classList.remove('on'));
+  const pg=document.getElementById('page-'+id);
+  if(!pg)return;
+  pg.classList.add('on');
+  document.querySelectorAll('[data-p="'+id+'"]').forEach(b=>b.classList.add('on'));
+  window.scrollTo(0,0);
+  setTimeout(observeAll,60);
+  if(id==='builds')renderBuilds('all');
+  if(id==='peripherals')renderPeripherals();
+  if(id==='home')renderFeat();
+  if(id==='categories')renderCats();
+  if(id==='favourites')renderFavs();
+}
+
+/* ════════════════════════════════════════
+   HELPERS
+════════════════════════════════════════ */
+const fmt=n=>Number(n).toLocaleString();
+const esc=s=>String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+
+/* ════════════════════════════════════════
+   PRODUCT CARD HTML
+════════════════════════════════════════ */
+function pcHTML(p){
+  const pct=p.op?Math.round((1-p.pr/p.op)*100):0;
+  const badge=pct>0?`<div class="pb sale">-${pct}%</div>`:`<div class="pb new_">New</div>`;
+  const isFav=favs.has(p.sku);
+  return`<div class="pc rv">
+    <div class="pc-img">
+      <img src="${p.img}" alt="${esc(p.nm)}" loading="lazy">
+      ${badge}
+      <div class="pc-acts">
+        <button class="pa" onclick="toggleFav('${p.sku}')" title="Favourites">${isFav?'♥':'♡'}</button>
+        <button class="pa main-a" onclick="openDetail('${p.sku}')">View Details</button>
+        <button class="pa" onclick="addCart('${p.sku}')">+ Cart</button>
+      </div>
+    </div>
+    <div class="pc-info">
+      <div class="pc-sku">SKU: ${esc(p.sku)}</div>
+      <div class="pc-nm">${esc(p.nm)}</div>
+      <div class="pc-pr">
+        <span class="pm">Rs.${fmt(p.pr)}</span>
+        ${p.op?`<span class="po">Rs.${fmt(p.op)}</span><span class="pp">-${pct}%</span>`:''}
+      </div>
+    </div>
+  </div>`;
+}
+
+/* ════════════════════════════════════════
+   RENDER FUNCTIONS
+════════════════════════════════════════ */
+function renderFeat(){
+  const g=document.getElementById('featGrid');
+  if(!g)return;
+  g.innerHTML=DB.filter(p=>p.feat).slice(0,4).map(pcHTML).join('');
+  observeAll();
+}
+
+function renderPeripherals(){
+  ['keyboards','mice','chairs','headphones','monitors','controllers'].forEach(cat=>{
+    const g=document.getElementById('grid-'+cat);
+    if(!g)return;
+    const items=DB.filter(p=>p.cat===cat);
+    g.innerHTML=items.length?items.map(pcHTML).join('')
+      :`<div style="grid-column:1/-1;padding:40px;text-align:center;color:var(--muted)">
+          <p style="font-size:14px;margin-bottom:16px">More stock arriving soon.</p>
+          <a href="https://wa.me/923115226682" target="_blank" class="btn-y" style="display:inline-flex">WhatsApp for Latest Stock →</a>
+        </div>`;
+  });
+  observeAll();
+}
+
+function renderBuilds(tier){
+  const g=document.getElementById('buildGrid');
+  if(!g)return;
+  const list=tier==='all'?BUILDS:BUILDS.filter(b=>b.tier===tier);
+  g.innerHTML=list.map(b=>`
+    <div class="bcard rv" data-tier="${b.tier}">
+      <div class="bcard-img"><img src="${b.img}" alt="${esc(b.nm)}" loading="lazy">
+        <div class="bcard-badge" style="${b.bc}">${b.badge}</div>
+      </div>
+      <div class="bcard-body">
+        <div class="bcard-nm">${esc(b.nm)}</div>
+        <div class="specs-g">${b.specs.map(s=>`<div class="spec"><div class="sk">${esc(s[0])}</div><div class="sv">${esc(s[1])}</div></div>`).join('')}</div>
+        <div class="bcard-ft">
+          <div class="bcard-pr"><small>Starting at</small>Rs.${fmt(b.pr)}</div>
+          <div class="bacts"><button class="bact detail" onclick="openBuildDetail('${b.id}')">View Details</button></div>
+        </div>
+      </div>
+    </div>`).join('');
+  observeAll();
+}
+
+function renderCats(){
+  const g=document.getElementById('catGrid');
+  if(!g)return;
+  g.innerHTML=CATS.map((c,i)=>`
+    <button class="ccard rv" onclick="CATS[${i}].action()">
+      <div class="ccard-img"><img src="${c.img}" alt="${esc(c.nm)}" loading="lazy"></div>
+      <div class="ccard-body">
+        <div class="ccard-nm">${esc(c.nm)}</div>
+        <div class="ccard-desc">${esc(c.desc)}</div>
+        <div class="tags">${c.tags.map(t=>`<span class="tag">${esc(t)}</span>`).join('')}</div>
+      </div>
+    </button>`).join('');
+  observeAll();
+}
+
+function renderFavs(){
+  const g=document.getElementById('favGrid');
+  const e=document.getElementById('favEmpty');
+  if(!g)return;
+  const favList=DB.filter(p=>favs.has(p.sku));
+  if(!favList.length){g.innerHTML='';e.style.display='block';return;}
+  e.style.display='none';
+  g.innerHTML=favList.map(pcHTML).join('');
+  observeAll();
+}
+
+/* ════════════════════════════════════════
+   PERIPHERALS TABS — smooth opacity+translate
+════════════════════════════════════════ */
+function switchTab(tabId){
+  document.querySelectorAll('.ptab').forEach(t=>t.classList.remove('on'));
+  document.querySelectorAll('.ppane').forEach(p=>p.classList.remove('on'));
+  /* Activate correct tab button */
+  const tabs=document.querySelectorAll('.ptab');
+  const tabOrder=['keyboards','mice','chairs','headphones','monitors','controllers'];
+  const idx=tabOrder.indexOf(tabId);
+  if(idx>=0&&tabs[idx])tabs[idx].classList.add('on');
+  /* Animate pane in */
+  const pane=document.getElementById('pane-'+tabId);
+  if(pane){pane.classList.add('on');}
+  curPeriTab=tabId;
+  renderPeripherals();
+  setTimeout(observeAll,40);
+}
+
+/* ════════════════════════════════════════
+   PRODUCT DETAIL — fully internal, no redirect
+════════════════════════════════════════ */
+function openDetail(sku){
+  const p=DB.find(x=>x.sku===sku);
+  if(!p){console.warn('openDetail: SKU not found',sku);return;}
+  prevPage=document.querySelector('.page.on')?.id?.replace('page-','')||'home';
+  const pct=p.op?Math.round((1-p.pr/p.op)*100):0;
+  const isFav=favs.has(sku);
+  const thumbsHTML=(p.imgs||[p.img]).map((img,i)=>`
+    <div class="det-th${i===0?' on':''}" onclick="swapImg(this,'${img}')">
+      <img src="${img}" alt="View ${i+1}" loading="lazy">
+    </div>`).join('');
+  const specsHTML=p.specs.map(s=>`<tr><td>${esc(s[0])}</td><td>${esc(s[1])}</td></tr>`).join('');
+  const descParas=p.desc.split('\n\n').map(par=>`<p>${esc(par)}</p>`).join('');
+
+  document.getElementById('detailContent').innerHTML=`
+    <div class="det-gal">
+      <div class="det-main"><img id="detMainImg" src="${p.imgs?.[0]||p.img}" alt="${esc(p.nm)}"></div>
+      <div class="det-thumbs">${thumbsHTML}</div>
+    </div>
+    <div class="det-info">
+      <div class="det-sku">SKU: ${esc(p.sku)}</div>
+      <div class="det-nm">${esc(p.nm)}</div>
+      <div class="det-stars">★★★★★ <span>(Verified Purchase)</span></div>
+      <div class="det-pr-row">
+        <div class="det-pr">Rs.${fmt(p.pr)}</div>
+        ${p.op?`<div class="det-pr-old">Rs.${fmt(p.op)}</div><div class="det-pct">-${pct}%</div>`:''}
+      </div>
+      <div class="det-desc">${descParas}</div>
+      <div class="det-spec-ttl">Specifications</div>
+      <table class="spec-table"><tbody>${specsHTML}</tbody></table>
+      <div class="qty-row">
+        <div class="qty-lbl">Qty</div>
+        <div class="qty-c">
+          <button class="qb" onclick="adjQty(-1)">−</button>
+          <div class="qv" id="qtyVal">1</div>
+          <button class="qb" onclick="adjQty(1)">+</button>
+        </div>
+      </div>
+      <div class="det-acts">
+        <button class="btn-y" onclick="addCartFromDetail('${sku}')">Add to Cart</button>
+        <button class="fav-btn${isFav?' faved':''}" id="detFavBtn" onclick="toggleFav('${sku}');this.classList.toggle('faved')" title="Save to Favourites">
+          <svg viewBox="0 0 24 24"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
+        </button>
+        <a href="https://wa.me/923115226682?text=${encodeURIComponent('Hi, I want to buy: '+p.nm+' (SKU: '+p.sku+')')}" target="_blank" class="btn-out">Buy via WhatsApp</a>
+      </div>
+    </div>`;
+
+  document.getElementById('detailBack').onclick=()=>go(prevPage);
+  go('detail');
+}
+
+function openBuildDetail(bid){
+  const b=BUILDS.find(x=>x.id===bid);
+  if(!b)return;
+  prevPage=document.querySelector('.page.on')?.id?.replace('page-','')||'builds';
+  const specsHTML=b.specs.map(s=>`<tr><td>${esc(s[0])}</td><td>${esc(s[1])}</td></tr>`).join('');
+  document.getElementById('detailContent').innerHTML=`
+    <div class="det-gal">
+      <div class="det-main"><img src="${b.img}" alt="${esc(b.nm)}"></div>
+    </div>
+    <div class="det-info">
+      <div class="det-sku" style="background:var(--card);border:1px solid var(--border);padding:3px 8px;border-radius:2px;display:inline-block;margin-bottom:9px">${b.badge}</div>
+      <div class="det-nm">${esc(b.nm)}</div>
+      <div class="det-pr-row"><div class="det-pr">Rs.${fmt(b.pr)}</div>${b.op?`<div class="det-pr-old">Rs.${fmt(b.op)}</div>`:''}</div>
+      <p style="font-size:13px;color:var(--muted);margin-bottom:20px">This is a custom-assembled gaming PC. Exact configuration may vary. WhatsApp us to confirm current components and pricing before ordering. All builds include free cable management and 30-day hardware warranty.</p>
+      <div class="det-spec-ttl">Specifications</div>
+      <table class="spec-table"><tbody>${specsHTML}</tbody></table>
+      <div class="det-acts" style="margin-top:20px">
+        <a href="https://wa.me/923115226682?text=${encodeURIComponent('I want to order: '+b.nm+' — Rs.'+fmt(b.pr))}" target="_blank" class="btn-y" style="background:var(--green);color:#fff">Order on WhatsApp</a>
+        <a href="https://wa.me/923115226682" target="_blank" class="btn-out">Ask a Question</a>
+      </div>
+      <p style="font-size:10px;color:var(--muted);margin-top:10px">50% advance required · Build time 2–5 working days · Delivery all over Pakistan</p>
+    </div>`;
+  document.getElementById('detailBack').onclick=()=>go(prevPage);
+  go('detail');
+}
+
+function swapImg(el,src){
+  document.getElementById('detMainImg').src=src;
+  document.querySelectorAll('.det-th').forEach(t=>t.classList.remove('on'));
+  el.classList.add('on');
+}
+function adjQty(d){const el=document.getElementById('qtyVal');if(!el)return;let v=parseInt(el.textContent)+d;el.textContent=Math.max(1,Math.min(v,99));}
+function addCartFromDetail(sku){const qty=parseInt(document.getElementById('qtyVal')?.textContent||'1');for(let i=0;i<qty;i++)addCart(sku);}
+
+/* ════════════════════════════════════════
+   CART
+════════════════════════════════════════ */
+function addCart(sku){
+  const p=DB.find(x=>x.sku===sku);if(!p)return;
+  const ex=cart.find(i=>i.sku===sku);
+  ex?ex.qty++:cart.push({sku,nm:p.nm,pr:p.pr,img:p.img,qty:1});
+  updateCart();openCart();
+}
+function rmCart(sku){cart=cart.filter(i=>i.sku!==sku);updateCart();}
+function cqty(sku,d){const i=cart.find(x=>x.sku===sku);if(!i)return;i.qty+=d;if(i.qty<=0)rmCart(sku);else updateCart();}
+
+function updateCart(){
+  const total=cart.reduce((s,i)=>s+i.pr*i.qty,0);
+  const count=cart.reduce((s,i)=>s+i.qty,0);
+  document.getElementById('cartCount').textContent=count;
+  document.getElementById('cartEmptyMsg').style.display=cart.length?'none':'block';
+  document.getElementById('cartFt').style.display=cart.length?'block':'none';
+  document.getElementById('cartItems').innerHTML=cart.map(i=>`
+    <div class="ci-row">
+      <img src="${i.img}" alt="${esc(i.nm)}" loading="lazy">
+      <div class="ci-info">
+        <div class="ci-nm">${esc(i.nm)}</div>
+        <div class="ci-sk">SKU: ${esc(i.sku)}</div>
+        <div class="ci-btm">
+          <span class="ci-pr">Rs.${fmt(i.pr)}</span>
+          <div class="cqty">
+            <button class="cqb" onclick="cqty('${i.sku}',-1)">−</button>
+            <div class="cqv">${i.qty}</div>
+            <button class="cqb" onclick="cqty('${i.sku}',1)">+</button>
+          </div>
+          <button class="ci-rm" onclick="rmCart('${i.sku}')">✕</button>
+        </div>
+      </div>
+    </div>`).join('');
+  document.getElementById('cartTotal').textContent='Rs.'+fmt(total);
+}
+function openCart(){document.getElementById('cartOv').classList.add('on');document.getElementById('cartDr').classList.add('on');}
+function closeCart(){document.getElementById('cartOv').classList.remove('on');document.getElementById('cartDr').classList.remove('on');}
+
+/* ════════════════════════════════════════
+   CHECKOUT
+════════════════════════════════════════ */
+function openCheckout(){
+  closeCart();
+  const total=cart.reduce((s,i)=>s+i.pr*i.qty,0);
+  document.getElementById('co-summary').innerHTML=`
+    <div style="font-size:9px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--muted);margin-bottom:7px">Order Summary</div>
+    ${cart.map(i=>`<div style="display:flex;justify-content:space-between;padding:4px 0;border-bottom:1px solid var(--border);font-size:11px"><span>${esc(i.nm)} ×${i.qty}</span><strong>Rs.${fmt(i.pr*i.qty)}</strong></div>`).join('')}
+    <div style="display:flex;justify-content:space-between;padding:7px 0 0;font-size:14px"><span>Total</span><strong style="color:var(--y)">Rs.${fmt(total)}</strong></div>`;
+  document.getElementById('coModal').classList.add('on');
+}
+function closeCheckout(){document.getElementById('coModal').classList.remove('on');}
+
+function submitOrder(){
+  const nm=document.getElementById('co-name').value.trim();
+  const em=document.getElementById('co-email').value.trim();
+  const ph=document.getElementById('co-phone').value.trim();
+  const ad=document.getElementById('co-addr').value.trim();
+  const pay=document.getElementById('co-pay').value;
+  if(!nm||!em||!ph||!ad){alert('Please fill all required fields.');return;}
+  const lines=cart.map(i=>`• ${i.nm} (SKU: ${i.sku}) ×${i.qty} — Rs.${fmt(i.pr*i.qty)}`).join('\n');
+  const total=cart.reduce((s,i)=>s+i.pr*i.qty,0);
+  const body=`New Order — Daddu Charger Website\n\nCustomer: ${nm}\nEmail: ${em}\nPhone: ${ph}\nAddress: ${ad}\nPayment: ${pay}\n\nItems:\n${lines}\n\nTotal: Rs.${fmt(total)}`;
+  window.location.href=`mailto:dadduchargergs@gmail.com?subject=${encodeURIComponent('New Order — '+nm)}&body=${encodeURIComponent(body)}`;
+  setTimeout(()=>window.open(`https://wa.me/923115226682?text=${encodeURIComponent(body)}`, '_blank'), 700);
+  closeCheckout();
+  cart=[];updateCart();
+  alert('✅ Order placed! Email app opened with order details. We\'ll confirm via WhatsApp shortly.');
+}
+
+/* ════════════════════════════════════════
+   FAVOURITES
+════════════════════════════════════════ */
+function toggleFav(sku){
+  favs.has(sku)?favs.delete(sku):favs.add(sku);
+  document.getElementById('favCount').textContent=favs.size;
+  /* Re-render favourites page if open */
+  if(document.getElementById('page-favourites').classList.contains('on')) renderFavs();
+}
+
+/* ════════════════════════════════════════
+   SKU SEARCH
+════════════════════════════════════════ */
+(()=>{
+  const inp=document.getElementById('skuQ');
+  const box=document.getElementById('sr');
+  inp.addEventListener('input',()=>{
+    const q=inp.value.trim().toUpperCase();
+    if(q.length<2){box.className='';box.innerHTML='';return;}
+    const hits=DB.filter(p=>p.sku.toUpperCase().includes(q)||p.nm.toUpperCase().includes(q)).slice(0,8);
+    box.innerHTML=hits.length
+      ?hits.map(p=>`<div class="sr-item" onclick="openDetail('${p.sku}');inp.value='';box.className=''" tabindex="0">
+          <img src="${p.img}" alt="${esc(p.nm)}" loading="lazy">
+          <div><div class="sr-nm">${esc(p.nm)}</div><div class="sr-sk">SKU: ${p.sku}</div></div>
+          <div class="sr-pr">Rs.${fmt(p.pr)}</div>
+        </div>`).join('')
+      :`<div class="sr-empty">No results for "${esc(q)}"</div>`;
+    box.className='open';
+  });
+  document.addEventListener('click',e=>{if(!e.target.closest('.sku-wrap')){box.className='';box.innerHTML='';}});
+})();
+
+/* ════════════════════════════════════════
+   MOBILE DRAWER
+════════════════════════════════════════ */
+document.getElementById('hamBtn').addEventListener('click',()=>document.getElementById('nd').classList.add('on'));
+function closeDrawer(){document.getElementById('nd').classList.remove('on');}
+document.getElementById('cartBtn').addEventListener('click',openCart);
+
+/* ════════════════════════════════════════
+   CONTACT FORM
+════════════════════════════════════════ */
+function contactSend(btn){
+  btn.textContent='Sending…';
+  setTimeout(()=>{btn.textContent='✓ Sent! We\'ll WhatsApp you shortly';btn.style.background='#22c55e';},1100);
+}
+
+/* ════════════════════════════════════════
+   BUILD FILTER
+════════════════════════════════════════ */
+function filterBuilds(btn,tier){
+  document.querySelectorAll('.fb').forEach(b=>b.classList.remove('on'));
+  btn.classList.add('on');
+  renderBuilds(tier);
+}
+
+/* ════════════════════════════════════════
+   INIT
+════════════════════════════════════════ */
+window.addEventListener('DOMContentLoaded',()=>{
+  renderFeat();
+  renderPeripherals();
+  renderBuilds('all');
+  renderCats();
+  updateCart();
+  observeAll();
+});
+</script>
+
+<!--
+═══════════════════════════════════════════════════════
+  DECAP CMS — HOW IT WORKS (Plain English Explanation)
+═══════════════════════════════════════════════════════
+
+  WHAT IS DECAP CMS?
+  Decap CMS (formerly Netlify CMS) is a free, open-source
+  content management system. It gives you a visual /admin
+  panel where you can add, edit, or delete products without
+  touching any code. Think of it like a WordPress dashboard
+  but for static/HTML sites.
+
+  WHY IS IT ONLY ONE HTML FILE RIGHT NOW?
+  This file is a self-contained prototype — all product data
+  lives in the JavaScript DB array at the bottom. When you
+  deploy to Netlify and add Decap CMS, the products move into
+  individual text files (Markdown/JSON) that Decap manages.
+  The site reads those files instead of the hardcoded array.
+
+  HOW TO ACTUALLY SET IT UP (step by step):
+
+  STEP 1 — Host on Netlify (free)
+    • Create a GitHub account and push this HTML file to a repo.
+    • Go to netlify.com, sign up, click "New site from Git".
+    • Connect your GitHub repo. Netlify auto-deploys it.
+    • Your site gets a URL like yoursite.netlify.app
+
+  STEP 2 — Enable Netlify Identity
+    • In Netlify dashboard → Site settings → Identity → Enable.
+    • Set Registration to "Invite only".
+    • Under Identity → Services → Enable Git Gateway.
+    • Invite yourself via the Identity tab.
+
+  STEP 3 — Create /admin/index.html
+    In your GitHub repo, create a folder called "admin" and
+    add a file admin/index.html with this exact content:
+
+    <!DOCTYPE html>
+    <html>
+    <head>
+      <meta charset="utf-8">
+      <title>Daddu Charger Admin</title>
+    </head>
+    <body>
+      <script src="https://unpkg.com/decap-cms@^3.0.0/dist/decap-cms.js"></script>
+    </body>
+    </html>
+
+  STEP 4 — Create /admin/config.yml
+    In the admin folder add config.yml:
+
+    backend:
+      name: git-gateway
+      branch: main
+
+    media_folder: "images"
+    public_folder: "/images"
+
+    collections:
+      - name: "products"
+        label: "Products"
+        folder: "_products"
+        create: true
+        slug: "{{sku}}"
+        fields:
+          - {label: "SKU",      name: "sku",      widget: "string"}
+          - {label: "Name",     name: "name",      widget: "string"}
+          - {label: "Category", name: "category",  widget: "select",
+             options: ["keyboards","mice","chairs","headphones","monitors","controllers"]}
+          - {label: "Price (PKR)",  name: "price",   widget: "number"}
+          - {label: "Old Price",   name: "oldPrice", widget: "number", required: false}
+          - {label: "Image",       name: "image",    widget: "image"}
+          - {label: "Description", name: "description", widget: "markdown"}
+          - {label: "Featured",    name: "featured", widget: "boolean", default: false}
+          - {label: "Specs",       name: "specs",    widget: "list",
+             fields:
+               - {label: "Key", name: "key", widget: "string"}
+               - {label: "Value", name: "value", widget: "string"}}
+
+  STEP 5 — Modify the site to read from files
+    Replace the hardcoded DB array with a fetch() call
+    that reads the JSON/Markdown files Decap generates.
+    This is a one-time code change (~20 lines).
+
+  STEP 6 — Use the admin panel
+    Visit yoursite.netlify.app/admin
+    Log in with your Netlify Identity email.
+    You'll see a "Products" section where you can:
+      + Add new product (fills in a form, saves to GitHub)
+      ✏ Edit existing product name/price/description
+      🗑 Delete a product
+    Every save triggers a new deployment — site updates in ~30 seconds.
+
+  IN SUMMARY:
+  Right now → Products are hardcoded in JavaScript (DB array)
+  After setup → Products live in text files that Decap manages
+  The /admin panel → A visual form interface for non-developers
+
+═══════════════════════════════════════════════════════
+-->
+</body>
+</html>
